@@ -1,0 +1,27 @@
+{
+    "summary": "Manage the outlines of your church meetings. Create programs with ordered items (songs, prayers, readings, sermon, etc.), then print them for distribution.",
+    "sections": [
+        {
+            "title": "Getting Started",
+            "content": "Go to Church Meetings > Meeting Outlines to create your first meeting. Set the date, title, type and preacher, then add items to build the outline."
+        },
+        {
+            "title": "Item Types",
+            "content": "Each item in the outline has a type: Song, Prayer, Bible Reading, Sermon, Offering, Announcements, Communion, or Other. You can also set a duration and a responsible person for each item."
+        },
+        {
+            "title": "Printing",
+            "content": "Once your meeting outline is ready, click the Print button to get a clean, printable view of the meeting outline."
+        },
+        {
+            "title": "Status",
+            "content": "Meetings can be in Draft (work in progress) or Published (finalized) status."
+        }
+    ],
+    "links": [
+        {
+            "label": "Report an issue",
+            "url": "https://github.com/ChurchCRM/CRM/issues"
+        }
+    ]
+}

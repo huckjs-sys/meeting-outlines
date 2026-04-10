@@ -1,0 +1,17 @@
+{
+    "id": "meeting-outlines",
+    "name": "Meeting Outlines",
+    "description": "Manage the outlines of church meetings. Create, edit and print meeting programs.",
+    "version": "1.0.0",
+    "author": "Eoles Conseil",
+    "authorUrl": "https://eoles-conseil.fr",
+    "type": "community",
+    "minimumCRMVersion": "7.0.0",
+    "mainClass": "ChurchCRM\\Plugins\\MeetingOutlines\\MeetingOutlinesPlugin",
+    "dependencies": [],
+    "settingsUrl": null,
+    "routesFile": "routes/routes.php",
+    "settings": [],
+    "menuItems": [],
+    "hooks": ["menu.building"]
+}
