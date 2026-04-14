@@ -75,7 +75,7 @@ $app->get('/meeting-outlines/services/{id:[0-9]+}/edit', function (Request $requ
     ]);
 })->add(AdminRoleAuthMiddleware::class);
 
-// Vue impression
+// Vue aperçu avant impression (conservée pour consultation)
 $app->get('/meeting-outlines/services/{id:[0-9]+}/print', function (Request $request, Response $response, array $args) use ($plugin): Response {
     $service = $plugin->getService((int) $args['id']);
 
@@ -93,6 +93,154 @@ $app->get('/meeting-outlines/services/{id:[0-9]+}/print', function (Request $req
         'serviceTypes' => MeetingOutlinesPlugin::getServiceTypes(),
         'itemTypes'    => MeetingOutlinesPlugin::getItemTypes(),
     ]);
+})->add(AdminRoleAuthMiddleware::class);
+
+// Export PDF
+$app->get('/meeting-outlines/services/{id:[0-9]+}/pdf', function (Request $request, Response $response, array $args) use ($plugin): Response {
+    $service = $plugin->getService((int) $args['id']);
+
+    if ($service === null) {
+        return $response->withStatus(404);
+    }
+
+    $items        = $plugin->getServiceItems((int) $args['id']);
+    $itemTypes    = MeetingOutlinesPlugin::getItemTypes();
+    $serviceTypes = MeetingOutlinesPlugin::getServiceTypes();
+
+    // Autoloader mPDF (vendoré dans lib/)
+    require_once __DIR__ . '/../lib/vendor/autoload.php';
+
+    // Répertoire temporaire dédié (doit être accessible en écriture par le serveur web)
+    $tempDir = sys_get_temp_dir() . '/mpdf_meeting_outlines';
+    if (!is_dir($tempDir)) {
+        mkdir($tempDir, 0755, true);
+    }
+
+    // --- Données ---
+    $churchName   = htmlspecialchars(\ChurchCRM\dto\SystemConfig::getValue('sChurchName') ?: '');
+    $serviceDate  = htmlspecialchars(date('d/m/Y', strtotime($service['date'])));
+    $serviceTitle = htmlspecialchars($service['title']);
+    $serviceType  = htmlspecialchars($serviceTypes[$service['type']] ?? $service['type']);
+    $preacher     = htmlspecialchars($service['preacher_display'] ?? $service['preacher'] ?? '');
+
+    $metaParts = [$serviceDate];
+    if ($preacher !== '') {
+        $metaParts[] = $preacher;
+    }
+    $metaParts[] = $serviceType;
+    $metaLine = implode(' &nbsp;&middot;&nbsp; ', $metaParts);
+
+    // --- Lignes du tableau ---
+    $rowsHtml = '';
+    if (empty($items)) {
+        $rowsHtml = '<tr><td colspan="5" style="text-align:center;font-style:italic;color:#888;padding:20pt;">'
+            . htmlspecialchars(gettext('No items added yet.'))
+            . '</td></tr>';
+    } else {
+        foreach ($items as $i => $item) {
+            $num       = $i + 1;
+            $typeLabel = htmlspecialchars($itemTypes[$item['item_type']] ?? $item['item_type']);
+            $title     = htmlspecialchars($item['title']);
+            $desc      = !empty($item['description'])
+                ? '<div class="item-desc">' . nl2br(htmlspecialchars($item['description'])) . '</div>'
+                : '';
+            $resp  = htmlspecialchars($item['responsible_display'] ?? $item['responsible'] ?? '');
+            $dur   = $item['duration_minutes']
+                ? (int) $item['duration_minutes'] . '&nbsp;' . htmlspecialchars(gettext('min'))
+                : '';
+            $bg    = ($i % 2 === 1) ? ' background:#fafafa;' : '';
+
+            $rowsHtml .= '<tr style="' . $bg . '">'
+                . '<td class="item-num">' . $num . '</td>'
+                . '<td class="item-type">' . $typeLabel . '</td>'
+                . '<td class="item-title">' . $title . $desc . '</td>'
+                . '<td class="item-resp">' . $resp . '</td>'
+                . '<td class="item-duration">' . $dur . '</td>'
+                . '</tr>';
+        }
+    }
+
+    // --- Notes ---
+    $notesHtml = '';
+    if (!empty($service['notes'])) {
+        $notesLabel   = htmlspecialchars(gettext('Notes'));
+        $notesContent = nl2br(htmlspecialchars($service['notes']));
+        $notesHtml    = '<div class="notes"><h2>' . $notesLabel . '</h2><p>' . $notesContent . '</p></div>';
+    }
+
+    // --- Labels colonnes ---
+    $lNum   = htmlspecialchars(gettext('#'));
+    $lType  = htmlspecialchars(gettext('Item Type'));
+    $lTitle = htmlspecialchars(gettext('Title'));
+    $lResp  = htmlspecialchars(gettext('Responsible'));
+    $lDur   = htmlspecialchars(gettext('Duration (minutes)'));
+
+    $footerParts = array_filter([$churchName, htmlspecialchars(gettext('Meeting Outline')), $serviceDate]);
+    $footerLine  = implode(' &nbsp;&middot;&nbsp; ', $footerParts);
+
+    // --- Template HTML → mPDF ---
+    $html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><style>'
+        . 'body        { font-family: dejavuserif; font-size: 11pt; color: #111; }'
+        . 'h1          { font-size: 17pt; font-weight: bold; text-align: center; margin: 0 0 6pt; }'
+        . '.meta       { text-align: center; font-size: 10pt; color: #444; margin-bottom: 6pt; }'
+        . '.separator  { border-top: 2pt solid #333; margin-bottom: 14pt; }'
+        . 'table       { width: 100%; border-collapse: collapse; }'
+        . 'th          { background: #efefef; border: 1pt solid #aaa; padding: 5pt 8pt;'
+        .               ' font-size: 9pt; text-transform: uppercase; letter-spacing: .04em; }'
+        . 'td          { border: 1pt solid #ccc; padding: 6pt 8pt; vertical-align: top; }'
+        . '.item-num   { width: 18pt; text-align: center; font-weight: bold; color: #555; }'
+        . '.item-type  { width: 80pt; font-style: italic; color: #555; }'
+        . '.item-title { font-weight: bold; }'
+        . '.item-desc  { font-size: 9pt; color: #444; margin-top: 3pt; font-weight: normal; }'
+        . '.item-resp  { width: 90pt; font-size: 10pt; color: #444; }'
+        . '.item-duration { width: 40pt; text-align: center; font-size: 9pt; color: #666; }'
+        . '.notes      { margin-top: 18pt; border-top: 1pt solid #ccc; padding-top: 10pt;'
+        .               ' font-size: 9pt; color: #444; }'
+        . '.notes h2   { font-size: 10pt; font-weight: bold; text-transform: uppercase;'
+        .               ' letter-spacing: .04em; margin-bottom: 5pt; }'
+        . '.footer     { margin-top: 20pt; border-top: 1pt solid #ccc; padding-top: 6pt;'
+        .               ' font-size: 8pt; color: #999; text-align: center; }'
+        . '</style></head><body>'
+        . '<h1>' . $serviceTitle . '</h1>'
+        . '<p class="meta">' . $metaLine . '</p>'
+        . '<div class="separator"></div>'
+        . '<table>'
+        .   '<thead><tr>'
+        .     '<th class="item-num">'      . $lNum   . '</th>'
+        .     '<th class="item-type">'     . $lType  . '</th>'
+        .     '<th>'                       . $lTitle . '</th>'
+        .     '<th class="item-resp">'     . $lResp  . '</th>'
+        .     '<th class="item-duration">' . $lDur   . '</th>'
+        .   '</tr></thead>'
+        .   '<tbody>' . $rowsHtml . '</tbody>'
+        . '</table>'
+        . $notesHtml
+        . '<div class="footer">' . $footerLine . '</div>'
+        . '</body></html>';
+
+    // --- Génération PDF ---
+    $mpdf = new \Mpdf\Mpdf([
+        'mode'          => 'utf-8',
+        'format'        => 'A4',
+        'margin_top'    => 20,
+        'margin_right'  => 18,
+        'margin_bottom' => 20,
+        'margin_left'   => 18,
+        'tempDir'       => $tempDir,
+        'default_font'  => 'dejavuserif',
+    ]);
+    $mpdf->SetTitle($service['title']);
+    $mpdf->WriteHTML($html);
+
+    $pdfContent = $mpdf->Output('', 'S');
+    $filename   = 'culte-' . $service['date'] . '.pdf';
+
+    $response->getBody()->write($pdfContent);
+
+    return $response
+        ->withHeader('Content-Type', 'application/pdf')
+        ->withHeader('Content-Disposition', 'attachment; filename="' . $filename . '"')
+        ->withHeader('Cache-Control', 'private, max-age=0, must-revalidate');
 })->add(AdminRoleAuthMiddleware::class);
 
 // Page réglages — GET

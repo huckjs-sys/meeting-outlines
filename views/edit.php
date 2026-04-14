@@ -142,9 +142,9 @@ $itemTypeColors = [
                     <i class="fa-solid fa-floppy-disk me-1"></i><?= gettext('Save') ?>
                 </button>
                 <?php if (!$isNew): ?>
-                <a href="<?= SystemURLs::getRootPath() ?>/plugins/meeting-outlines/services/<?= $serviceId ?>/print"
-                   class="btn btn-info" target="_blank">
-                    <i class="fa-solid fa-print me-1"></i><?= gettext('Print Order') ?>
+                <a href="<?= SystemURLs::getRootPath() ?>/plugins/meeting-outlines/services/<?= $serviceId ?>/pdf"
+                   class="btn btn-danger">
+                    <i class="fa-solid fa-file-pdf me-1"></i><?= gettext('Download PDF') ?>
                 </a>
                 <?php endif; ?>
                 <a href="<?= SystemURLs::getRootPath() ?>/plugins/meeting-outlines/services"

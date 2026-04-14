@@ -1,0 +1,10 @@
+{
+    "name": "meeting-outlines/pdf-deps",
+    "description": "PDF generation dependencies for the Meeting Outlines plugin",
+    "require": {
+        "mpdf/mpdf": "^8.2"
+    },
+    "config": {
+        "vendor-dir": "vendor"
+    }
+}

@@ -64,9 +64,9 @@ require SystemURLs::getDocumentRoot() . '/Include/Header.php';
                                class="btn btn-primary" title="<?= gettext('Edit Service') ?>">
                                 <i class="fa-solid fa-pen-to-square"></i>
                             </a>
-                            <a href="<?= SystemURLs::getRootPath() ?>/plugins/meeting-outlines/services/<?= $s['id'] ?>/print"
-                               class="btn btn-info" target="_blank" title="<?= gettext('Print Order') ?>">
-                                <i class="fa-solid fa-print"></i>
+                            <a href="<?= SystemURLs::getRootPath() ?>/plugins/meeting-outlines/services/<?= $s['id'] ?>/pdf"
+                               class="btn btn-danger" title="<?= gettext('Download PDF') ?>">
+                                <i class="fa-solid fa-file-pdf"></i>
                             </a>
                             <button type="button" class="btn btn-danger btn-delete"
                                     data-id="<?= $s['id'] ?>"

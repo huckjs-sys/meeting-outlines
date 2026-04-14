@@ -135,14 +135,14 @@ use ChurchCRM\dto\SystemURLs;
             text-align: center;
         }
 
-        /* Bouton impression (écran seulement) */
+        /* Boutons (écran seulement) */
         .screen-only {
             text-align: center;
             padding: 16px 0 8px;
         }
-        .btn-print {
+        .btn-pdf {
             display: inline-block;
-            background: #2e7d32;
+            background: #b71c1c;
             color: #fff;
             border: none;
             border-radius: 4px;
@@ -163,12 +163,6 @@ use ChurchCRM\dto\SystemURLs;
             text-decoration: none;
             margin-right: 10px;
         }
-
-        @media print {
-            .screen-only { display: none; }
-            .print-footer { position: fixed; bottom: 0; width: 100%; }
-            body { padding: 0; }
-        }
     </style>
 </head>
 <body>
@@ -179,9 +173,10 @@ use ChurchCRM\dto\SystemURLs;
         <a href="javascript:history.back()" class="btn-back">
             &#8592; <?= gettext('Back') ?>
         </a>
-        <button class="btn-print" onclick="window.print()">
-            &#128438; <?= gettext('Print') ?>
-        </button>
+        <a href="<?= SystemURLs::getRootPath() ?>/plugins/meeting-outlines/services/<?= (int) $service['id'] ?>/pdf"
+           class="btn-pdf">
+            &#128196; <?= gettext('Download PDF') ?>
+        </a>
     </div>
 
     <!-- En-tête -->

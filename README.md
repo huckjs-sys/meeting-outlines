@@ -19,7 +19,8 @@ Manage the outlines of church meetings. Create, edit and print meeting programs 
 - **Bible reference selector** (book / chapter / from verse / to verse) for Bible Reading items
 - **Bible versions:** LSG 1910 (built-in), Darby, Crampon, KJV, ASV — configurable from Meeting Settings
 - Draft / Published status workflow
-- Clean printable view (standalone page, no CRM chrome)
+- **PDF export** — server-side generation via mPDF, downloads directly as `culte-YYYY-MM-DD.pdf`
+- HTML preview page (for quick on-screen review before downloading)
 - Fully internationalised — all strings go through `gettext()` and are extracted by `npm run locale:build`
 
 ---
@@ -34,15 +35,20 @@ meeting-outlines/
 ├── data/
 │   ├── bible-structure.json        ← 66 books, chapter/verse counts (OT + NT)
 │   └── bible-versions.json         ← available Bible versions (LSG, FRD, FRC, KJV, ASV)
+├── lib/
+│   ├── composer.json               ← Composer manifest for PDF dependencies
+│   ├── composer.lock
+│   └── vendor/                     ← vendored PHP libraries (mPDF + dependencies, ~15 MB)
+│       └── autoload.php
 ├── src/
-│   └── MeetingOutlinesPlugin.php      ← main plugin class (boot, activate, uninstall, data access)
+│   └── MeetingOutlinesPlugin.php   ← main plugin class (boot, activate, uninstall, data access)
 ├── routes/
-│   └── routes.php                  ← Slim 4 routes: MVC pages + REST API
+│   └── routes.php                  ← Slim 4 routes: MVC pages + REST API + PDF export
 └── views/
     ├── list.php                    ← list of meetings (DataTables)
     ├── edit.php                    ← create/edit a meeting + manage its outline items
     ├── settings.php                ← admin settings (groups, Bible version)
-    └── print.php                   ← standalone printable meeting outline
+    └── print.php                   ← standalone HTML preview of a meeting outline
 ```
 
 ---
@@ -140,7 +146,8 @@ All routes are prefixed with `/plugins/` by the ChurchCRM route loader.
 | GET | `/plugins/meeting-outlines/services` | List all meetings | Admin |
 | GET | `/plugins/meeting-outlines/services/new` | Create meeting form | Admin |
 | GET | `/plugins/meeting-outlines/services/{id}/edit` | Edit meeting + manage items | Admin |
-| GET | `/plugins/meeting-outlines/services/{id}/print` | Printable meeting outline | Admin |
+| GET | `/plugins/meeting-outlines/services/{id}/print` | HTML preview of a meeting outline | Admin |
+| GET | `/plugins/meeting-outlines/services/{id}/pdf`   | Download meeting outline as PDF    | Admin |
 | GET | `/plugins/meeting-outlines/settings` | Meeting Settings page | Admin |
 | POST | `/plugins/meeting-outlines/settings` | Save settings | Admin |
 
@@ -294,6 +301,21 @@ print dialog produces a clean output without navigation, buttons or page chrome.
 
 ---
 
+## PDF Export
+
+PDF generation is handled server-side by [mPDF](https://mpdf.github.io/) (v8.x, MIT licence),
+vendored in `lib/vendor/`. No Composer installation is needed on the target server — the
+libraries ship with the plugin.
+
+The PDF route (`GET /plugins/meeting-outlines/services/{id}/pdf`) builds an A4 document using
+DejaVu Serif (bundled with mPDF), which covers all Latin characters including French accents.
+The generated file is named `culte-YYYY-MM-DD.pdf` and downloaded directly by the browser.
+
+mPDF writes temporary files to `sys_get_temp_dir()/mpdf_meeting_outlines/`. The web server
+user must have write access to the system temp directory (standard on any Linux/PHP setup).
+
+---
+
 ## Known Limitations
 
 - No Propel model classes — raw SQL only (intentional, see above)
@@ -301,6 +323,7 @@ print dialog produces a clean output without navigation, buttons or page chrome.
 - `SystemConfig.php` must be edited manually for each new community plugin
   (architectural limitation of the current ChurchCRM version)
 - Bible text is not bundled for FRD, FRC, KJV, ASV — only the reference selector works
+- `lib/vendor/` adds ~15 MB to the plugin repository (mPDF + DejaVu fonts)
 
 ---
 
