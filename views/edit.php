@@ -29,7 +29,7 @@ $itemTypeColors = [
                 </li>
                 <li class="breadcrumb-item">
                     <a href="<?= SystemURLs::getRootPath() ?>/plugins/meeting-outlines/services">
-                        <?= gettext('Meeting Outlines') ?>
+                        <?= dgettext('meeting-outlines','Meeting Outlines') ?>
                     </a>
                 </li>
                 <li class="breadcrumb-item active"><?= $sPageTitle ?></li>
@@ -49,19 +49,19 @@ $itemTypeColors = [
         <form id="service-form" novalidate>
             <div class="row">
                 <div class="col-md-3 mb-3">
-                    <label for="svc_date" class="form-label"><?= gettext('Meeting Date') ?> <span class="text-danger">*</span></label>
+                    <label for="svc_date" class="form-label"><?= dgettext('meeting-outlines','Meeting Date') ?> <span class="text-danger">*</span></label>
                     <input type="date" id="svc_date" name="date" class="form-control" required
                            value="<?= htmlspecialchars($service['date'] ?? date('Y-m-d')) ?>">
                 </div>
                 <div class="col-md-5 mb-3">
-                    <label for="svc_title" class="form-label"><?= gettext('Title') ?> <span class="text-danger">*</span></label>
+                    <label for="svc_title" class="form-label"><?= dgettext('meeting-outlines','Title') ?> <span class="text-danger">*</span></label>
                     <input type="text" id="svc_title" name="title" class="form-control" required
                            maxlength="200"
-                           placeholder="<?= gettext('e.g., Sunday Morning Meeting') ?>"
+                           placeholder="<?= dgettext('meeting-outlines','e.g., Sunday Morning Meeting') ?>"
                            value="<?= htmlspecialchars($service['title'] ?? '') ?>">
                 </div>
                 <div class="col-md-4 mb-3">
-                    <label for="svc_type" class="form-label"><?= gettext('Type') ?></label>
+                    <label for="svc_type" class="form-label"><?= dgettext('meeting-outlines','Type') ?></label>
                     <select id="svc_type" name="type" class="form-select">
                         <?php foreach ($serviceTypes as $key => $label): ?>
                         <option value="<?= $key ?>"
@@ -72,10 +72,10 @@ $itemTypeColors = [
                     </select>
                 </div>
                 <div class="col-md-4 mb-3">
-                    <label for="svc_preacher" class="form-label"><?= gettext('Preacher') ?></label>
+                    <label for="svc_preacher" class="form-label"><?= dgettext('meeting-outlines','Preacher') ?></label>
                     <?php if (!empty($preachersMembers)): ?>
                     <select id="svc_preacher" name="preacher_person_id" class="form-select">
-                        <option value=""><?= gettext('— Select a preacher —') ?></option>
+                        <option value=""><?= dgettext('meeting-outlines','— Select a preacher —') ?></option>
                         <?php foreach ($preachersMembers as $m): ?>
                         <option value="<?= (int) $m['id'] ?>"
                             <?= isset($service['preacher_person_id']) && (int) $service['preacher_person_id'] === $m['id'] ? 'selected' : '' ?>>
@@ -86,20 +86,20 @@ $itemTypeColors = [
                     <?php else: ?>
                     <input type="text" id="svc_preacher" name="preacher" class="form-control"
                            maxlength="150"
-                           placeholder="<?= gettext('No preacher group configured') ?>"
+                           placeholder="<?= dgettext('meeting-outlines','No preacher group configured') ?>"
                            value="<?= htmlspecialchars($service['preacher'] ?? '') ?>">
                     <div class="form-text">
                         <a href="<?= SystemURLs::getRootPath() ?>/plugins/meeting-outlines/settings">
-                            <i class="fa-solid fa-gear"></i> <?= gettext('Configure a group in Settings') ?>
+                            <i class="fa-solid fa-gear"></i> <?= dgettext('meeting-outlines','Configure a group in Settings') ?>
                         </a>
                     </div>
                     <?php endif; ?>
                 </div>
                 <div class="col-md-4 mb-3">
-                    <label for="svc_president" class="form-label"><?= gettext('President') ?></label>
+                    <label for="svc_president" class="form-label"><?= dgettext('meeting-outlines','President') ?></label>
                     <?php if (!empty($responsiblesMembers)): ?>
                     <select id="svc_president" name="president_person_id" class="form-select">
-                        <option value=""><?= gettext('— Select a president —') ?></option>
+                        <option value=""><?= dgettext('meeting-outlines','— Select a president —') ?></option>
                         <?php foreach ($responsiblesMembers as $m): ?>
                         <option value="<?= (int) $m['id'] ?>"
                             <?= isset($service['president_person_id']) && (int) $service['president_person_id'] === $m['id'] ? 'selected' : '' ?>>
@@ -109,16 +109,16 @@ $itemTypeColors = [
                     </select>
                     <?php else: ?>
                     <input type="text" id="svc_president" name="president_person_id" class="form-control"
-                           disabled placeholder="<?= gettext('Configure a group in Settings') ?>">
+                           disabled placeholder="<?= dgettext('meeting-outlines','Configure a group in Settings') ?>">
                     <div class="form-text">
                         <a href="<?= SystemURLs::getRootPath() ?>/plugins/meeting-outlines/settings">
-                            <i class="fa-solid fa-gear"></i> <?= gettext('Configure a group in Settings') ?>
+                            <i class="fa-solid fa-gear"></i> <?= dgettext('meeting-outlines','Configure a group in Settings') ?>
                         </a>
                     </div>
                     <?php endif; ?>
                 </div>
                 <div class="col-md-4 mb-3">
-                    <label for="svc_status" class="form-label"><?= gettext('Status') ?></label>
+                    <label for="svc_status" class="form-label"><?= dgettext('meeting-outlines','Status') ?></label>
                     <select id="svc_status" name="status" class="form-select">
                         <?php foreach ($statusLabels as $key => $label): ?>
                         <option value="<?= $key ?>"
@@ -132,24 +132,24 @@ $itemTypeColors = [
                     <!-- spacer -->
                 </div>
                 <div class="col-12 mb-3">
-                    <label for="svc_notes" class="form-label"><?= gettext('Notes') ?></label>
+                    <label for="svc_notes" class="form-label"><?= dgettext('meeting-outlines','Notes') ?></label>
                     <textarea id="svc_notes" name="notes" class="form-control" rows="2"
                               maxlength="1000"><?= htmlspecialchars($service['notes'] ?? '') ?></textarea>
                 </div>
             </div>
             <div class="d-flex gap-2">
                 <button type="submit" class="btn btn-success" id="btn-save-service">
-                    <i class="fa-solid fa-floppy-disk me-1"></i><?= gettext('Save') ?>
+                    <i class="fa-solid fa-floppy-disk me-1"></i><?= dgettext('meeting-outlines','Save') ?>
                 </button>
                 <?php if (!$isNew): ?>
                 <a href="<?= SystemURLs::getRootPath() ?>/plugins/meeting-outlines/services/<?= $serviceId ?>/pdf"
                    class="btn btn-danger">
-                    <i class="fa-solid fa-file-pdf me-1"></i><?= gettext('Download PDF') ?>
+                    <i class="fa-solid fa-file-pdf me-1"></i><?= dgettext('meeting-outlines','Download PDF') ?>
                 </a>
                 <?php endif; ?>
                 <a href="<?= SystemURLs::getRootPath() ?>/plugins/meeting-outlines/services"
                    class="btn btn-secondary ms-auto">
-                    <?= gettext('Cancel') ?>
+                    <?= dgettext('meeting-outlines','Cancel') ?>
                 </a>
             </div>
         </form>
@@ -161,17 +161,17 @@ $itemTypeColors = [
 <div class="card">
     <div class="card-header d-flex align-items-center justify-content-between">
         <h3 class="card-title mb-0">
-            <i class="fa-solid fa-list-ol me-2"></i><?= gettext('Meeting Outline') ?>
+            <i class="fa-solid fa-list-ol me-2"></i><?= dgettext('meeting-outlines','Meeting Outline') ?>
         </h3>
         <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#itemModal"
                 onclick="openItemModal(null)">
-            <i class="fa-solid fa-plus me-1"></i><?= gettext('Add Item') ?>
+            <i class="fa-solid fa-plus me-1"></i><?= dgettext('meeting-outlines','Add Item') ?>
         </button>
     </div>
     <div class="card-body p-0">
         <div id="items-empty" class="text-center text-muted py-5 <?= !empty($items) ? 'd-none' : '' ?>">
             <i class="fa-solid fa-list fa-2x mb-2"></i><br>
-            <?= gettext('No items added yet.') ?>
+            <?= dgettext('meeting-outlines','No items added yet.') ?>
         </div>
         <ul id="items-list" class="list-group list-group-flush">
             <?php foreach ($items as $item): ?>
@@ -196,7 +196,7 @@ $itemTypeColors = [
             <li class="list-group-item d-flex align-items-center gap-3 py-2"
                 data-id="<?= $item['id'] ?>"
                 data-duration="<?= (int) ($item['duration_minutes'] ?? 0) ?>">
-                <span class="drag-handle text-muted flex-shrink-0" style="cursor:grab" title="<?= gettext('Drag to reorder') ?>">
+                <span class="drag-handle text-muted flex-shrink-0" style="cursor:grab" title="<?= dgettext('meeting-outlines','Drag to reorder') ?>">
                     <i class="fa-solid fa-grip-vertical"></i>
                 </span>
                 <span class="badge item-type-badge flex-shrink-0 <?= $itemTypeColors[$item['item_type']] ?? 'item-badge-other' ?>">
@@ -220,7 +220,7 @@ $itemTypeColors = [
                 </div>
                 <?php if ($item['duration_minutes']): ?>
                 <small class="text-muted text-nowrap item-duration flex-shrink-0">
-                    <i class="fa-regular fa-clock"></i> <?= (int) $item['duration_minutes'] ?> <?= gettext('min') ?>
+                    <i class="fa-regular fa-clock"></i> <?= (int) $item['duration_minutes'] ?> <?= dgettext('meeting-outlines','min') ?>
                 </small>
                 <?php else: ?>
                 <small class="text-muted text-nowrap item-duration flex-shrink-0"></small>
@@ -245,7 +245,7 @@ $itemTypeColors = [
         <div id="items-footer" class="d-flex justify-content-between align-items-center px-3 py-2 border-top bg-light text-muted small">
             <span id="items-footer-count">
                 <i class="fa-solid fa-list-ol me-1"></i>
-                <?= sprintf(ngettext('%d item', '%d items', $itemCount), $itemCount) ?>
+                <?= sprintf(dngettext('meeting-outlines', '%d item', '%d items', $itemCount), $itemCount) ?>
             </span>
             <span id="items-footer-duration">
                 <?php if ($totalDuration > 0): ?>
@@ -268,14 +268,14 @@ $itemTypeColors = [
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="itemModalLabel"><?= gettext('Add Item') ?></h5>
+                <h5 class="modal-title" id="itemModalLabel"><?= dgettext('meeting-outlines','Add Item') ?></h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
                 <form id="item-form" novalidate>
                     <input type="hidden" id="item_id" name="id" value="">
                     <div class="mb-3">
-                        <label for="item_type" class="form-label"><?= gettext('Item Type') ?></label>
+                        <label for="item_type" class="form-label"><?= dgettext('meeting-outlines','Item Type') ?></label>
                         <select id="item_type" name="item_type" class="form-select">
                             <?php foreach ($itemTypes as $key => $label): ?>
                             <option value="<?= $key ?>"><?= htmlspecialchars($label) ?></option>
@@ -283,7 +283,7 @@ $itemTypeColors = [
                         </select>
                     </div>
                     <div class="mb-3">
-                        <label for="item_title" class="form-label"><?= gettext('Title') ?> <span class="text-danger">*</span></label>
+                        <label for="item_title" class="form-label"><?= dgettext('meeting-outlines','Title') ?> <span class="text-danger">*</span></label>
                         <input type="text" id="item_title" name="title" class="form-control" required
                                maxlength="200">
                     </div>
@@ -291,24 +291,24 @@ $itemTypeColors = [
                     <!-- Référence biblique — visible uniquement pour bible_reading -->
                     <div id="bible-ref-fields" class="mb-3 p-3 border rounded bg-light" style="display:none">
                         <label class="form-label fw-semibold">
-                            <i class="fa-solid fa-book-open me-1"></i><?= gettext('Bible Reference') ?>
+                            <i class="fa-solid fa-book-open me-1"></i><?= dgettext('meeting-outlines','Bible Reference') ?>
                         </label>
                         <div class="row g-2">
                             <div class="col-12">
-                                <label for="item_bible_book" class="form-label small"><?= gettext('Book') ?></label>
+                                <label for="item_bible_book" class="form-label small"><?= dgettext('meeting-outlines','Book') ?></label>
                                 <select id="item_bible_book" name="bible_book" class="form-select form-select-sm">
-                                    <option value=""><?= gettext('— Select a book —') ?></option>
+                                    <option value=""><?= dgettext('meeting-outlines','— Select a book —') ?></option>
                                     <?php
                                     $bibleBooks = $bibleStructure['books'] ?? [];
                                     $otBooks    = array_filter($bibleBooks, fn($b) => $b['t'] === 'OT');
                                     $ntBooks    = array_filter($bibleBooks, fn($b) => $b['t'] === 'NT');
                                     ?>
-                                    <optgroup label="<?= gettext('Old Testament') ?>">
+                                    <optgroup label="<?= dgettext('meeting-outlines','Old Testament') ?>">
                                         <?php foreach ($otBooks as $book): ?>
                                         <option value="<?= $book['num'] ?>"><?= htmlspecialchars($book['fr']) ?></option>
                                         <?php endforeach; ?>
                                     </optgroup>
-                                    <optgroup label="<?= gettext('New Testament') ?>">
+                                    <optgroup label="<?= dgettext('meeting-outlines','New Testament') ?>">
                                         <?php foreach ($ntBooks as $book): ?>
                                         <option value="<?= $book['num'] ?>"><?= htmlspecialchars($book['fr']) ?></option>
                                         <?php endforeach; ?>
@@ -316,31 +316,31 @@ $itemTypeColors = [
                                 </select>
                             </div>
                             <div class="col-4">
-                                <label for="item_bible_chapter" class="form-label small"><?= gettext('Chapter') ?></label>
+                                <label for="item_bible_chapter" class="form-label small"><?= dgettext('meeting-outlines','Chapter') ?></label>
                                 <select id="item_bible_chapter" name="bible_chapter" class="form-select form-select-sm">
-                                    <option value=""><?= gettext('—') ?></option>
+                                    <option value=""><?= dgettext('meeting-outlines','—') ?></option>
                                 </select>
                             </div>
                             <div class="col-4">
-                                <label for="item_bible_verse_start" class="form-label small"><?= gettext('From verse') ?></label>
+                                <label for="item_bible_verse_start" class="form-label small"><?= dgettext('meeting-outlines','From verse') ?></label>
                                 <select id="item_bible_verse_start" name="bible_verse_start" class="form-select form-select-sm">
-                                    <option value=""><?= gettext('—') ?></option>
+                                    <option value=""><?= dgettext('meeting-outlines','—') ?></option>
                                 </select>
                             </div>
                             <div class="col-4">
-                                <label for="item_bible_verse_end" class="form-label small"><?= gettext('To verse') ?></label>
+                                <label for="item_bible_verse_end" class="form-label small"><?= dgettext('meeting-outlines','To verse') ?></label>
                                 <select id="item_bible_verse_end" name="bible_verse_end" class="form-select form-select-sm">
-                                    <option value=""><?= gettext('—') ?></option>
+                                    <option value=""><?= dgettext('meeting-outlines','—') ?></option>
                                 </select>
                             </div>
                         </div>
                     </div>
 
                     <div class="mb-3">
-                        <label for="item_responsible" class="form-label"><?= gettext('Responsible') ?></label>
+                        <label for="item_responsible" class="form-label"><?= dgettext('meeting-outlines','Responsible') ?></label>
                         <?php if (!empty($responsiblesMembers)): ?>
                         <select id="item_responsible_id" name="responsible_person_id" class="form-select">
-                            <option value=""><?= gettext('— Select a responsible —') ?></option>
+                            <option value=""><?= dgettext('meeting-outlines','— Select a responsible —') ?></option>
                             <?php foreach ($responsiblesMembers as $m): ?>
                             <option value="<?= (int) $m['id'] ?>"><?= htmlspecialchars($m['name']) ?></option>
                             <?php endforeach; ?>
@@ -348,25 +348,25 @@ $itemTypeColors = [
                         <?php else: ?>
                         <input type="text" id="item_responsible" name="responsible" class="form-control"
                                maxlength="150"
-                               placeholder="<?= gettext('No responsible group configured') ?>">
+                               placeholder="<?= dgettext('meeting-outlines','No responsible group configured') ?>">
                         <?php endif; ?>
                     </div>
                     <div class="mb-3">
-                        <label for="item_duration" class="form-label"><?= gettext('Duration (minutes)') ?></label>
+                        <label for="item_duration" class="form-label"><?= dgettext('meeting-outlines','Duration (minutes)') ?></label>
                         <input type="number" id="item_duration" name="duration_minutes" class="form-control"
                                min="1" max="999">
                     </div>
                     <div class="mb-3">
-                        <label for="item_description" class="form-label"><?= gettext('Description') ?></label>
+                        <label for="item_description" class="form-label"><?= dgettext('meeting-outlines','Description') ?></label>
                         <textarea id="item_description" name="description" class="form-control"
                                   rows="3" maxlength="2000"></textarea>
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><?= gettext('Cancel') ?></button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><?= dgettext('meeting-outlines','Cancel') ?></button>
                 <button type="button" class="btn btn-success" id="btn-save-item">
-                    <i class="fa-solid fa-floppy-disk me-1"></i><?= gettext('Save') ?>
+                    <i class="fa-solid fa-floppy-disk me-1"></i><?= dgettext('meeting-outlines','Save') ?>
                 </button>
             </div>
         </div>
@@ -403,18 +403,18 @@ const ROOT_PATH    = <?= json_encode(SystemURLs::getRootPath()) ?>;
 const SERVICE_ID   = <?= json_encode($serviceId) ?>;
 const IS_NEW       = <?= json_encode($isNew) ?>;
 const LABELS = {
-    addItem:       <?= json_encode(gettext('Add Item')) ?>,
-    editItem:      <?= json_encode(gettext('Edit Item')) ?>,
-    confirmDelete: <?= json_encode(gettext('Are you sure you want to delete this item?')) ?>,
-    saved:         <?= json_encode(gettext('Meeting saved successfully.')) ?>,
-    itemAdded:     <?= json_encode(gettext('Item added.')) ?>,
-    itemUpdated:   <?= json_encode(gettext('Item updated.')) ?>,
-    itemDeleted:   <?= json_encode(gettext('Item deleted.')) ?>,
-    error:         <?= json_encode(gettext('An error occurred. Please try again.')) ?>,
-    minDuration:   <?= json_encode(gettext('min')) ?>,
-    selectChapter: <?= json_encode(gettext('— Select a chapter —')) ?>,
-    selectVerse:   <?= json_encode(gettext('— Select a verse —')) ?>,
-    noVerse:       <?= json_encode(gettext('—')) ?>,
+    addItem:       <?= json_encode(dgettext('meeting-outlines','Add Item')) ?>,
+    editItem:      <?= json_encode(dgettext('meeting-outlines','Edit Item')) ?>,
+    confirmDelete: <?= json_encode(dgettext('meeting-outlines','Are you sure you want to delete this item?')) ?>,
+    saved:         <?= json_encode(dgettext('meeting-outlines','Meeting saved successfully.')) ?>,
+    itemAdded:     <?= json_encode(dgettext('meeting-outlines','Item added.')) ?>,
+    itemUpdated:   <?= json_encode(dgettext('meeting-outlines','Item updated.')) ?>,
+    itemDeleted:   <?= json_encode(dgettext('meeting-outlines','Item deleted.')) ?>,
+    error:         <?= json_encode(dgettext('meeting-outlines','An error occurred. Please try again.')) ?>,
+    minDuration:   <?= json_encode(dgettext('meeting-outlines','min')) ?>,
+    selectChapter: <?= json_encode(dgettext('meeting-outlines','— Select a chapter —')) ?>,
+    selectVerse:   <?= json_encode(dgettext('meeting-outlines','— Select a verse —')) ?>,
+    noVerse:       <?= json_encode(dgettext('meeting-outlines','—')) ?>,
 };
 const ITEM_TYPES    = <?= json_encode($itemTypes) ?>;
 const ITEM_TYPE_COLORS = <?= json_encode($itemTypeColors) ?>;
@@ -732,7 +732,7 @@ function buildItemHTML(item, typeLabel, responsible, bibleRef, descPreview, dura
         : '';
 
     const colorClass = ITEM_TYPE_COLORS[item.item_type] || 'item-badge-other';
-    return '<span class="drag-handle text-muted flex-shrink-0" style="cursor:grab" title="<?= addslashes(gettext('Drag to reorder')) ?>">'
+    return '<span class="drag-handle text-muted flex-shrink-0" style="cursor:grab" title="<?= addslashes(dgettext('meeting-outlines','Drag to reorder')) ?>">'
         + '<i class="fa-solid fa-grip-vertical"></i></span>'
         + '<span class="badge item-type-badge flex-shrink-0 ' + colorClass + '">' + escHtml(typeLabel) + '</span>'
         + '<div class="flex-grow-1 d-flex align-items-center flex-wrap gap-2 min-w-0">'
@@ -770,7 +770,7 @@ function updateItemsFooter() {
     const countEl = document.getElementById('items-footer-count');
     if (countEl) {
         countEl.innerHTML = '<i class="fa-solid fa-list-ol me-1"></i>'
-            + count + ' ' + (count > 1 ? <?= json_encode(gettext('items')) ?> : <?= json_encode(gettext('item')) ?>);
+            + count + ' ' + (count > 1 ? <?= json_encode(dgettext('meeting-outlines','items')) ?> : <?= json_encode(dgettext('meeting-outlines','item')) ?>);
     }
     const durEl = document.getElementById('items-footer-duration');
     if (durEl) {

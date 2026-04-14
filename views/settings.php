@@ -14,10 +14,10 @@ require SystemURLs::getDocumentRoot() . '/Include/Header.php';
                 </li>
                 <li class="breadcrumb-item">
                     <a href="<?= SystemURLs::getRootPath() ?>/plugins/meeting-outlines/services">
-                        <?= gettext('Meeting Outlines') ?>
+                        <?= dgettext('meeting-outlines','Meeting Outlines') ?>
                     </a>
                 </li>
-                <li class="breadcrumb-item active"><?= gettext('Meeting Settings') ?></li>
+                <li class="breadcrumb-item active"><?= dgettext('meeting-outlines','Meeting Settings') ?></li>
             </ol>
         </nav>
     </div>
@@ -38,17 +38,17 @@ require SystemURLs::getDocumentRoot() . '/Include/Header.php';
     <div class="card mb-4">
         <div class="card-header">
             <h3 class="card-title mb-0">
-                <i class="fa-solid fa-microphone me-2"></i><?= gettext('Preachers') ?>
+                <i class="fa-solid fa-microphone me-2"></i><?= dgettext('meeting-outlines','Preachers') ?>
             </h3>
         </div>
         <div class="card-body">
             <div class="row align-items-end">
                 <div class="col-md-6 mb-3">
                     <label for="preachers_group_id" class="form-label">
-                        <?= gettext('Group linked to Preachers') ?>
+                        <?= dgettext('meeting-outlines','Group linked to Preachers') ?>
                     </label>
                     <select id="preachers_group_id" name="preachers_group_id" class="form-select">
-                        <option value="0"><?= gettext('— No group selected —') ?></option>
+                        <option value="0"><?= dgettext('meeting-outlines','— No group selected —') ?></option>
                         <?php foreach ($allGroups as $group): ?>
                         <option value="<?= (int) $group['Id'] ?>"
                             <?= (int) $group['Id'] === $preachersGroupId ? 'selected' : '' ?>>
@@ -57,19 +57,19 @@ require SystemURLs::getDocumentRoot() . '/Include/Header.php';
                         <?php endforeach; ?>
                     </select>
                     <div class="form-text">
-                        <?= gettext('Members of this group will appear in the Preacher dropdown when creating a service.') ?>
+                        <?= dgettext('meeting-outlines','Members of this group will appear in the Preacher dropdown when creating a service.') ?>
                         <?php if (empty($allGroups)): ?>
                         <br><span class="text-warning">
                             <i class="fa-solid fa-triangle-exclamation"></i>
-                            <?= gettext('No groups found.') ?>
-                            <a href="<?= SystemURLs::getRootPath() ?>/v2/groups/list"><?= gettext('Create a group first.') ?></a>
+                            <?= dgettext('meeting-outlines','No groups found.') ?>
+                            <a href="<?= SystemURLs::getRootPath() ?>/v2/groups/list"><?= dgettext('meeting-outlines','Create a group first.') ?></a>
                         </span>
                         <?php endif; ?>
                     </div>
                 </div>
                 <?php if ($preachersGroupId > 0 && !empty($preachersMembers)): ?>
                 <div class="col-md-6 mb-3">
-                    <label class="form-label"><?= gettext('Members in this group') ?></label>
+                    <label class="form-label"><?= dgettext('meeting-outlines','Members in this group') ?></label>
                     <ul class="list-group list-group-flush border rounded" style="max-height:160px;overflow-y:auto">
                         <?php foreach ($preachersMembers as $m): ?>
                         <li class="list-group-item py-1 px-3 small">
@@ -89,17 +89,17 @@ require SystemURLs::getDocumentRoot() . '/Include/Header.php';
     <div class="card mb-4">
         <div class="card-header">
             <h3 class="card-title mb-0">
-                <i class="fa-solid fa-users me-2"></i><?= gettext('Responsibles') ?>
+                <i class="fa-solid fa-users me-2"></i><?= dgettext('meeting-outlines','Responsibles') ?>
             </h3>
         </div>
         <div class="card-body">
             <div class="row align-items-end">
                 <div class="col-md-6 mb-3">
                     <label for="responsibles_group_id" class="form-label">
-                        <?= gettext('Group linked to Responsibles') ?>
+                        <?= dgettext('meeting-outlines','Group linked to Responsibles') ?>
                     </label>
                     <select id="responsibles_group_id" name="responsibles_group_id" class="form-select">
-                        <option value="0"><?= gettext('— No group selected —') ?></option>
+                        <option value="0"><?= dgettext('meeting-outlines','— No group selected —') ?></option>
                         <?php foreach ($allGroups as $group): ?>
                         <option value="<?= (int) $group['Id'] ?>"
                             <?= (int) $group['Id'] === $responsiblesGroupId ? 'selected' : '' ?>>
@@ -108,12 +108,12 @@ require SystemURLs::getDocumentRoot() . '/Include/Header.php';
                         <?php endforeach; ?>
                     </select>
                     <div class="form-text">
-                        <?= gettext('Members of this group will appear in the Responsible dropdown for each item in the order of service.') ?>
+                        <?= dgettext('meeting-outlines','Members of this group will appear in the Responsible dropdown for each item in the order of service.') ?>
                     </div>
                 </div>
                 <?php if ($responsiblesGroupId > 0 && !empty($responsiblesMembers)): ?>
                 <div class="col-md-6 mb-3">
-                    <label class="form-label"><?= gettext('Members in this group') ?></label>
+                    <label class="form-label"><?= dgettext('meeting-outlines','Members in this group') ?></label>
                     <ul class="list-group list-group-flush border rounded" style="max-height:160px;overflow-y:auto">
                         <?php foreach ($responsiblesMembers as $m): ?>
                         <li class="list-group-item py-1 px-3 small">
@@ -133,38 +133,38 @@ require SystemURLs::getDocumentRoot() . '/Include/Header.php';
     <div class="card mb-4">
         <div class="card-header">
             <h3 class="card-title mb-0">
-                <i class="fa-solid fa-book-open me-2"></i><?= gettext('Bible Version') ?>
+                <i class="fa-solid fa-book-open me-2"></i><?= dgettext('meeting-outlines','Bible Version') ?>
             </h3>
         </div>
         <div class="card-body">
             <div class="row">
                 <div class="col-md-5 mb-3">
                     <label for="bible_version" class="form-label">
-                        <?= gettext('Default Bible version') ?>
+                        <?= dgettext('meeting-outlines','Default Bible version') ?>
                     </label>
                     <select id="bible_version" name="bible_version" class="form-select">
                         <?php foreach ($bibleVersions as $v): ?>
                         <option value="<?= htmlspecialchars($v['code']) ?>"
                             <?= $v['code'] === $currentBibleVersion ? 'selected' : '' ?>>
                             <?= htmlspecialchars($v['name']) ?>
-                            <?= $v['local'] ? ' (' . gettext('built-in') . ')' : '' ?>
+                            <?= $v['local'] ? ' (' . dgettext('meeting-outlines','built-in') . ')' : '' ?>
                         </option>
                         <?php endforeach; ?>
                     </select>
                     <div class="form-text">
-                        <?= gettext('This version is shown in the print view and used for Bible reading references.') ?>
+                        <?= dgettext('meeting-outlines','This version is shown in the print view and used for Bible reading references.') ?>
                     </div>
                 </div>
                 <div class="col-md-7 mb-3">
-                    <label class="form-label"><?= gettext('Available versions') ?></label>
+                    <label class="form-label"><?= dgettext('meeting-outlines','Available versions') ?></label>
                     <div class="table-responsive">
                         <table class="table table-sm table-bordered mb-0">
                             <thead class="table-light">
                                 <tr>
-                                    <th><?= gettext('Code') ?></th>
-                                    <th><?= gettext('Name') ?></th>
-                                    <th><?= gettext('Language') ?></th>
-                                    <th><?= gettext('Built-in') ?></th>
+                                    <th><?= dgettext('meeting-outlines','Code') ?></th>
+                                    <th><?= dgettext('meeting-outlines','Name') ?></th>
+                                    <th><?= dgettext('meeting-outlines','Language') ?></th>
+                                    <th><?= dgettext('meeting-outlines','Built-in') ?></th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -175,7 +175,7 @@ require SystemURLs::getDocumentRoot() . '/Include/Header.php';
                                     <td><?= htmlspecialchars(strtoupper($v['lang'])) ?></td>
                                     <td class="text-center">
                                         <?php if ($v['local']): ?>
-                                        <i class="fa-solid fa-check text-success" title="<?= gettext('Built-in') ?>"></i>
+                                        <i class="fa-solid fa-check text-success" title="<?= dgettext('meeting-outlines','Built-in') ?>"></i>
                                         <?php else: ?>
                                         <span class="text-muted">—</span>
                                         <?php endif; ?>
@@ -193,11 +193,11 @@ require SystemURLs::getDocumentRoot() . '/Include/Header.php';
     <!-- Bouton enregistrer -->
     <div class="d-flex gap-2">
         <button type="submit" class="btn btn-success">
-            <i class="fa-solid fa-floppy-disk me-1"></i><?= gettext('Save Settings') ?>
+            <i class="fa-solid fa-floppy-disk me-1"></i><?= dgettext('meeting-outlines','Save Settings') ?>
         </button>
         <a href="<?= SystemURLs::getRootPath() ?>/plugins/meeting-outlines/services"
            class="btn btn-secondary ms-auto">
-            <?= gettext('Back to Meeting Outlines') ?>
+            <?= dgettext('meeting-outlines','Back to Meeting Outlines') ?>
         </a>
     </div>
 

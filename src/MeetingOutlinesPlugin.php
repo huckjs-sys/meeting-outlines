@@ -33,12 +33,12 @@ class MeetingOutlinesPlugin extends AbstractPlugin
 
     public function getName(): string
     {
-        return gettext('Meeting Outlines');
+        return dgettext('meeting-outlines','Meeting Outlines');
     }
 
     public function getDescription(): string
     {
-        return gettext('Manage the outlines of church meetings.');
+        return dgettext('meeting-outlines','Manage the outlines of church meetings.');
     }
 
     public function boot(): void
@@ -73,15 +73,15 @@ class MeetingOutlinesPlugin extends AbstractPlugin
             return $menus;
         }
 
-        $menu = new MenuItem(gettext('Church Meetings'), '', true, 'fa-church');
+        $menu = new MenuItem(dgettext('meeting-outlines','Church Meetings'), '', true, 'fa-church');
         $menu->addSubMenu(new MenuItem(
-            gettext('Meeting Outlines'),
+            dgettext('meeting-outlines','Meeting Outlines'),
             'plugins/meeting-outlines/services',
             true,
             'fa-list-ol'
         ));
         $menu->addSubMenu(new MenuItem(
-            gettext('Meeting Settings'),
+            dgettext('meeting-outlines','Meeting Settings'),
             'plugins/meeting-outlines/settings',
             true,
             'fa-gear'
@@ -556,32 +556,32 @@ class MeetingOutlinesPlugin extends AbstractPlugin
     public static function getServiceTypes(): array
     {
         return [
-            'sunday'  => gettext('Sunday Meeting'),
-            'prayer'  => gettext('Prayer Meeting'),
-            'special' => gettext('Special Meeting'),
-            'other'   => gettext('Other'),
+            'sunday'  => dgettext('meeting-outlines','Sunday Meeting'),
+            'prayer'  => dgettext('meeting-outlines','Prayer Meeting'),
+            'special' => dgettext('meeting-outlines','Special Meeting'),
+            'other'   => dgettext('meeting-outlines','Other'),
         ];
     }
 
     public static function getItemTypes(): array
     {
         return [
-            'song'          => gettext('Song'),
-            'prayer'        => gettext('Prayer'),
-            'bible_reading' => gettext('Bible Reading'),
-            'sermon'        => gettext('Sermon'),
-            'offering'      => gettext('Offering'),
-            'announcements' => gettext('Announcements'),
-            'communion'     => gettext('Communion'),
-            'other'         => gettext('Other'),
+            'song'          => dgettext('meeting-outlines','Song'),
+            'prayer'        => dgettext('meeting-outlines','Prayer'),
+            'bible_reading' => dgettext('meeting-outlines','Bible Reading'),
+            'sermon'        => dgettext('meeting-outlines','Sermon'),
+            'offering'      => dgettext('meeting-outlines','Offering'),
+            'announcements' => dgettext('meeting-outlines','Announcements'),
+            'communion'     => dgettext('meeting-outlines','Communion'),
+            'other'         => dgettext('meeting-outlines','Other'),
         ];
     }
 
     public static function getStatusLabels(): array
     {
         return [
-            'draft'     => gettext('Draft'),
-            'published' => gettext('Published'),
+            'draft'     => dgettext('meeting-outlines','Draft'),
+            'published' => dgettext('meeting-outlines','Published'),
         ];
     }
 }

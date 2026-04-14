@@ -12,7 +12,7 @@ require SystemURLs::getDocumentRoot() . '/Include/Header.php';
                 <li class="breadcrumb-item">
                     <a href="<?= SystemURLs::getRootPath() ?>/v2/dashboard"><i class="fa-solid fa-home"></i></a>
                 </li>
-                <li class="breadcrumb-item active"><?= gettext('Meeting Outlines') ?></li>
+                <li class="breadcrumb-item active"><?= dgettext('meeting-outlines','Meeting Outlines') ?></li>
             </ol>
         </nav>
     </div>
@@ -21,25 +21,25 @@ require SystemURLs::getDocumentRoot() . '/Include/Header.php';
 <div class="card">
     <div class="card-header d-flex align-items-center justify-content-between">
         <h3 class="card-title mb-0">
-            <i class="fa-solid fa-list-ol me-2"></i><?= gettext('Meetings') ?>
+            <i class="fa-solid fa-list-ol me-2"></i><?= dgettext('meeting-outlines','Meetings') ?>
         </h3>
         <a href="<?= SystemURLs::getRootPath() ?>/plugins/meeting-outlines/services/new"
            class="btn btn-success btn-sm">
-            <i class="fa-solid fa-plus me-1"></i><?= gettext('Add Meeting') ?>
+            <i class="fa-solid fa-plus me-1"></i><?= dgettext('meeting-outlines','Add Meeting') ?>
         </a>
     </div>
     <div class="table-responsive">
         <table id="services-table" class="table table-vcenter table-hover card-table">
             <thead>
                 <tr>
-                    <th><?= gettext('Date') ?></th>
-                    <th><?= gettext('Title') ?></th>
-                    <th><?= gettext('Type') ?></th>
-                    <th><?= gettext('Preacher') ?></th>
-                    <th><?= gettext('President') ?></th>
-                    <th><?= gettext('Status') ?></th>
-                    <th class="text-center"><?= gettext('Items') ?></th>
-                    <th class="no-export w-1"><?= gettext('Actions') ?></th>
+                    <th><?= dgettext('meeting-outlines','Date') ?></th>
+                    <th><?= dgettext('meeting-outlines','Title') ?></th>
+                    <th><?= dgettext('meeting-outlines','Type') ?></th>
+                    <th><?= dgettext('meeting-outlines','Preacher') ?></th>
+                    <th><?= dgettext('meeting-outlines','President') ?></th>
+                    <th><?= dgettext('meeting-outlines','Status') ?></th>
+                    <th class="text-center"><?= dgettext('meeting-outlines','Items') ?></th>
+                    <th class="no-export w-1"><?= dgettext('meeting-outlines','Actions') ?></th>
                 </tr>
             </thead>
             <tbody>
@@ -52,26 +52,26 @@ require SystemURLs::getDocumentRoot() . '/Include/Header.php';
                     <td><?= htmlspecialchars($s['president_display'] ?? '') ?></td>
                     <td>
                         <?php if ($s['status'] === 'published'): ?>
-                            <span class="badge bg-success"><?= gettext('Published') ?></span>
+                            <span class="badge bg-success"><?= dgettext('meeting-outlines','Published') ?></span>
                         <?php else: ?>
-                            <span class="badge bg-secondary"><?= gettext('Draft') ?></span>
+                            <span class="badge bg-secondary"><?= dgettext('meeting-outlines','Draft') ?></span>
                         <?php endif; ?>
                     </td>
                     <td class="text-center"><?= (int) $s['item_count'] ?></td>
                     <td>
                         <div class="btn-group btn-group-sm">
                             <a href="<?= SystemURLs::getRootPath() ?>/plugins/meeting-outlines/services/<?= $s['id'] ?>/edit"
-                               class="btn btn-primary" title="<?= gettext('Edit Service') ?>">
+                               class="btn btn-primary" title="<?= dgettext('meeting-outlines','Edit Service') ?>">
                                 <i class="fa-solid fa-pen-to-square"></i>
                             </a>
                             <a href="<?= SystemURLs::getRootPath() ?>/plugins/meeting-outlines/services/<?= $s['id'] ?>/pdf"
-                               class="btn btn-danger" title="<?= gettext('Download PDF') ?>">
+                               class="btn btn-danger" title="<?= dgettext('meeting-outlines','Download PDF') ?>">
                                 <i class="fa-solid fa-file-pdf"></i>
                             </a>
                             <button type="button" class="btn btn-danger btn-delete"
                                     data-id="<?= $s['id'] ?>"
                                     data-title="<?= htmlspecialchars($s['title']) ?>"
-                                    title="<?= gettext('Delete Service') ?>">
+                                    title="<?= dgettext('meeting-outlines','Delete Service') ?>">
                                 <i class="fa-solid fa-trash"></i>
                             </button>
                         </div>
@@ -86,9 +86,9 @@ require SystemURLs::getDocumentRoot() . '/Include/Header.php';
 <script>
 const ROOT_PATH = <?= json_encode(SystemURLs::getRootPath()) ?>;
 const LABELS = {
-    confirmDelete: <?= json_encode(gettext('Are you sure you want to delete this meeting?')) ?>,
-    deleted:       <?= json_encode(gettext('Meeting deleted.')) ?>,
-    error:         <?= json_encode(gettext('An error occurred. Please try again.')) ?>,
+    confirmDelete: <?= json_encode(dgettext('meeting-outlines','Are you sure you want to delete this meeting?')) ?>,
+    deleted:       <?= json_encode(dgettext('meeting-outlines','Meeting deleted.')) ?>,
+    error:         <?= json_encode(dgettext('meeting-outlines','An error occurred. Please try again.')) ?>,
 };
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -98,7 +98,7 @@ document.addEventListener('DOMContentLoaded', function () {
             order: [[0, 'desc']],
             columnDefs: [{ orderable: false, targets: [7] }],
             language: $.extend(true, {}, (window.CRM.plugin.dataTable.language || {}), {
-                emptyTable: <?= json_encode(gettext('No services found.')) ?>,
+                emptyTable: <?= json_encode(dgettext('meeting-outlines','No services found.')) ?>,
             }),
         });
         $('#services-table').DataTable(dtConfig);

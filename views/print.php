@@ -8,7 +8,7 @@ use ChurchCRM\dto\SystemURLs;
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= gettext('Meeting Outline') ?> — <?= htmlspecialchars($service['title']) ?></title>
+    <title><?= dgettext('meeting-outlines','Meeting Outline') ?> — <?= htmlspecialchars($service['title']) ?></title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -171,11 +171,11 @@ use ChurchCRM\dto\SystemURLs;
     <!-- Boutons écran -->
     <div class="screen-only">
         <a href="javascript:history.back()" class="btn-back">
-            &#8592; <?= gettext('Back') ?>
+            &#8592; <?= dgettext('meeting-outlines','Back') ?>
         </a>
         <a href="<?= SystemURLs::getRootPath() ?>/plugins/meeting-outlines/services/<?= (int) $service['id'] ?>/pdf"
            class="btn-pdf">
-            &#128196; <?= gettext('Download PDF') ?>
+            &#128196; <?= dgettext('meeting-outlines','Download PDF') ?>
         </a>
     </div>
 
@@ -195,16 +195,16 @@ use ChurchCRM\dto\SystemURLs;
 
     <!-- Programme -->
     <?php if (empty($items)): ?>
-        <p class="empty-msg"><?= gettext('No items added yet.') ?></p>
+        <p class="empty-msg"><?= dgettext('meeting-outlines','No items added yet.') ?></p>
     <?php else: ?>
     <table class="order-table">
         <thead>
             <tr>
                 <th class="item-num">#</th>
-                <th><?= gettext('Item Type') ?></th>
-                <th><?= gettext('Title') ?></th>
-                <th><?= gettext('Responsible') ?></th>
-                <th><?= gettext('Duration (minutes)') ?></th>
+                <th><?= dgettext('meeting-outlines','Item Type') ?></th>
+                <th><?= dgettext('meeting-outlines','Title') ?></th>
+                <th><?= dgettext('meeting-outlines','Responsible') ?></th>
+                <th><?= dgettext('meeting-outlines','Duration (minutes)') ?></th>
             </tr>
         </thead>
         <tbody>
@@ -224,7 +224,7 @@ use ChurchCRM\dto\SystemURLs;
                     <?= htmlspecialchars($item['responsible']) ?>
                 </td>
                 <td class="item-duration-col">
-                    <?= $item['duration_minutes'] ? (int)$item['duration_minutes'] . ' ' . gettext('min') : '' ?>
+                    <?= $item['duration_minutes'] ? (int)$item['duration_minutes'] . ' ' . dgettext('meeting-outlines','min') : '' ?>
                 </td>
             </tr>
         <?php endforeach; ?>
@@ -235,7 +235,7 @@ use ChurchCRM\dto\SystemURLs;
     <!-- Notes -->
     <?php if (!empty($service['notes'])): ?>
     <div class="notes-block">
-        <h2><?= gettext('Notes') ?></h2>
+        <h2><?= dgettext('meeting-outlines','Notes') ?></h2>
         <p><?= nl2br(htmlspecialchars($service['notes'])) ?></p>
     </div>
     <?php endif; ?>
@@ -244,7 +244,7 @@ use ChurchCRM\dto\SystemURLs;
     <div class="print-footer">
         <?= htmlspecialchars(SystemConfig::getValue('sChurchName') ?: '') ?>
         &nbsp;·&nbsp;
-        <?= gettext('Meeting Outline') ?>
+        <?= dgettext('meeting-outlines','Meeting Outline') ?>
         &nbsp;·&nbsp;
         <?= htmlspecialchars(date('d/m/Y', strtotime($service['date']))) ?>
     </div>

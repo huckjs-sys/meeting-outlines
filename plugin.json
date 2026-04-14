@@ -13,5 +13,6 @@
     "routesFile": "routes/routes.php",
     "settings": [],
     "menuItems": [],
-    "hooks": ["menu.building"]
+    "hooks": ["menu.building"],
+    "permissions": ["db.read", "db.write", "fs.read", "fs.write"]
 }
