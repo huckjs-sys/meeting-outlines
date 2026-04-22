@@ -334,6 +334,9 @@ $itemTypeColors = [
                                 </select>
                             </div>
                         </div>
+                        <div id="bible-text-preview"
+                             class="mt-2 p-2 border rounded bg-white small text-secondary lh-base"
+                             style="display:none; max-height:160px; overflow-y:auto; font-style:italic"></div>
                     </div>
 
                     <div class="mb-3">
@@ -419,6 +422,7 @@ const LABELS = {
 const ITEM_TYPES    = <?= json_encode($itemTypes) ?>;
 const ITEM_TYPE_COLORS = <?= json_encode($itemTypeColors) ?>;
 const BIBLE_BOOKS   = <?= json_encode($bibleStructure['books'] ?? []) ?>;
+const BIBLE_VERSION = <?= json_encode($plugin->getBibleVersion()) ?>;
 const HAS_RESPONSIBLES = <?= json_encode(!empty($responsiblesMembers)) ?>;
 
 // ------------------------------------------------------------------
@@ -489,13 +493,43 @@ function updateBibleVerses(bookNum, chapterNum, selectedStart, selectedEnd) {
     populateSelect(veeSel,  endOpts,   selectedEnd   || '');
 }
 
+function loadVersePreview() {
+    const bookNum    = document.getElementById('item_bible_book').value;
+    const chapter    = document.getElementById('item_bible_chapter').value;
+    const verseStart = document.getElementById('item_bible_verse_start').value;
+    const verseEnd   = document.getElementById('item_bible_verse_end').value;
+    const preview    = document.getElementById('bible-text-preview');
+
+    if (!bookNum || !chapter || !verseStart) {
+        preview.style.display = 'none';
+        return;
+    }
+
+    fetch(ROOT_PATH + '/plugins/meeting-outlines/api/bible/' + BIBLE_VERSION + '/' + bookNum + '/' + chapter)
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+            if (!data.verses) { preview.style.display = 'none'; return; }
+            const start  = parseInt(verseStart, 10);
+            const end    = verseEnd ? parseInt(verseEnd, 10) : start;
+            const verses = data.verses.filter(function (v) { return v.num >= start && v.num <= end; });
+            if (verses.length === 0) { preview.style.display = 'none'; return; }
+            preview.innerHTML = verses.map(function (v) {
+                return '<sup class="me-1 fw-semibold">' + v.num + '</sup>' + escHtml(v.text);
+            }).join(' ');
+            preview.style.display = '';
+        })
+        .catch(function () { preview.style.display = 'none'; });
+}
+
 document.addEventListener('change', function (e) {
     if (e.target.id === 'item_type') {
         const isBible = e.target.value === 'bible_reading';
         document.getElementById('bible-ref-fields').style.display = isBible ? '' : 'none';
+        if (!isBible) document.getElementById('bible-text-preview').style.display = 'none';
     }
     if (e.target.id === 'item_bible_book') {
         updateBibleChapters(e.target.value, '');
+        document.getElementById('bible-text-preview').style.display = 'none';
     }
     if (e.target.id === 'item_bible_chapter') {
         updateBibleVerses(
@@ -504,6 +538,10 @@ document.addEventListener('change', function (e) {
             '',
             ''
         );
+        document.getElementById('bible-text-preview').style.display = 'none';
+    }
+    if (e.target.id === 'item_bible_verse_start' || e.target.id === 'item_bible_verse_end') {
+        loadVersePreview();
     }
 });
 
@@ -566,6 +604,12 @@ function openItemModal(itemData) {
         }
     } else {
         updateBibleChapters('', '');
+    }
+
+    // Charger l'aperçu si la référence est complète
+    document.getElementById('bible-text-preview').style.display = 'none';
+    if (isBible && bookNum && chapter && verseStart) {
+        loadVersePreview();
     }
 
     // responsible

@@ -100,6 +100,18 @@ use ChurchCRM\dto\SystemURLs;
             color: #666;
             white-space: nowrap;
         }
+        .verse-text {
+            margin-top: 5px;
+            font-size: 10pt;
+            color: #333;
+            font-style: italic;
+            line-height: 1.5;
+        }
+        .verse-text sup {
+            font-size: 7pt;
+            color: #888;
+            margin-right: 2px;
+        }
 
         /* Message vide */
         .empty-msg {
@@ -223,6 +235,13 @@ use ChurchCRM\dto\SystemURLs;
                     <?= htmlspecialchars($item['title']) ?>
                     <?php if (!empty($item['description'])): ?>
                         <div class="item-desc"><?= htmlspecialchars($item['description']) ?></div>
+                    <?php endif; ?>
+                    <?php if (!empty($item['verse_texts'])): ?>
+                        <div class="verse-text">
+                            <?php foreach ($item['verse_texts'] as $v): ?>
+                                <sup><?= (int) $v['num'] ?></sup><?= htmlspecialchars($v['text']) ?>
+                            <?php endforeach; ?>
+                        </div>
                     <?php endif; ?>
                 </td>
                 <td class="item-responsible">

@@ -83,15 +83,31 @@ $app->get('/meeting-outlines/services/{id:[0-9]+}/print', function (Request $req
         return $response->withStatus(404);
     }
 
+    $items        = $plugin->getServiceItems((int) $args['id']);
+    $bibleVersion = $plugin->getBibleVersion();
+
+    foreach ($items as &$item) {
+        if ($item['item_type'] === 'bible_reading' && !empty($item['bible_book']) && !empty($item['bible_chapter'])) {
+            $verses = $plugin->getBibleChapter($bibleVersion, (int) $item['bible_book'], (int) $item['bible_chapter']);
+            $start  = (int) ($item['bible_verse_start'] ?? 1);
+            $end    = (int) ($item['bible_verse_end'] ?: $start);
+            $item['verse_texts'] = array_values(
+                array_filter($verses, fn($v) => $v['num'] >= $start && $v['num'] <= $end)
+            );
+        }
+    }
+    unset($item);
+
     $renderer = new PhpRenderer(__DIR__ . '/../views/');
 
     return $renderer->render($response, 'print.php', [
         'sRootPath'    => SystemURLs::getRootPath(),
         'sPageTitle'   => gettext('Meeting Outline'),
         'service'      => $service,
-        'items'        => $plugin->getServiceItems((int) $args['id']),
+        'items'        => $items,
         'serviceTypes' => MeetingOutlinesPlugin::getServiceTypes(),
         'itemTypes'    => MeetingOutlinesPlugin::getItemTypes(),
+        'bibleVersion' => $bibleVersion,
     ]);
 })->add(AdminRoleAuthMiddleware::class);
 
@@ -354,6 +370,24 @@ $app->group('/meeting-outlines/api', function (RouteCollectorProxy $group) use (
         $members = $plugin->getGroupMembers((int) $args['id']);
 
         return SlimUtils::renderJSON($response, ['members' => $members]);
+    });
+
+    // GET /plugins/meeting-outlines/api/bible/{version}/{book}/{chapter}
+    $group->get('/bible/{version:[A-Z]+}/{book:[0-9]+}/{chapter:[0-9]+}', function (Request $request, Response $response, array $args) use ($plugin): Response {
+        $localVersions = array_column(
+            array_filter($plugin->getBibleVersions(), fn($v) => $v['local']),
+            'code'
+        );
+        if (!in_array($args['version'], $localVersions, true)) {
+            return SlimUtils::renderJSON($response, ['success' => false, 'message' => gettext('Version not available.')], 404);
+        }
+
+        $verses = $plugin->getBibleChapter($args['version'], (int) $args['book'], (int) $args['chapter']);
+        if (empty($verses)) {
+            return SlimUtils::renderJSON($response, ['success' => false, 'message' => gettext('Chapter not found.')], 404);
+        }
+
+        return SlimUtils::renderJSON($response, ['verses' => $verses]);
     });
 
     // POST /plugins/meeting-outlines/api/services/{id}/items/reorder
