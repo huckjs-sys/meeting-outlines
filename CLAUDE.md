@@ -20,4 +20,5 @@ Never push a fix directly to `main` without going through this flow.
 
 ## Language
 
-All GitHub issues and pull requests must be written in **English**.
+- Conversation with the user: **French**
+- Everything pushed to GitHub (issues, pull requests, commit messages, code comments): **English**
