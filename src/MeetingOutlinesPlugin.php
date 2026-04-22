@@ -276,6 +276,25 @@ class MeetingOutlinesPlugin extends AbstractPlugin
         return $data['versions'] ?? [];
     }
 
+    public function getBibleChapter(string $version, int $book, int $chapter): array
+    {
+        $localVersions = array_column(
+            array_filter($this->getBibleVersions(), fn($v) => $v['local']),
+            'code'
+        );
+        if (!in_array($version, $localVersions, true)) {
+            return [];
+        }
+
+        $path = $this->basePath . '/data/bible-text-' . $version . '.json';
+        if (!file_exists($path)) {
+            return [];
+        }
+
+        $data = json_decode(file_get_contents($path), true) ?? [];
+        return $data[(string) $book][(string) $chapter] ?? [];
+    }
+
     public function formatBibleRef(int $bookNum, int $chapter, int $verseStart, ?int $verseEnd, string $lang = 'fr'): string
     {
         $structure = $this->getBibleStructure();
