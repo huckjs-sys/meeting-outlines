@@ -5,7 +5,7 @@ Manage the outlines of church meetings. Create, edit and print meeting programs 
 - **Plugin ID:** `meeting-outlines`
 - **Type:** Community
 - **Author:** Eoles Conseil
-- **Minimum ChurchCRM version:** 7.1.x (Koineo fork)
+- **Minimum ChurchCRM version:** 7.3.0 ("Community & Connection" — introduces the community plugin framework)
 
 ---
 

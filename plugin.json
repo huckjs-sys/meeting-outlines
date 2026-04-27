@@ -6,7 +6,7 @@
     "author": "Eoles Conseil",
     "authorUrl": "https://eoles-conseil.fr",
     "type": "community",
-    "minimumCRMVersion": "7.0.0",
+    "minimumCRMVersion": "7.3.0",
     "mainClass": "ChurchCRM\\Plugins\\MeetingOutlines\\MeetingOutlinesPlugin",
     "dependencies": [],
     "settingsUrl": null,
