@@ -282,7 +282,7 @@ require SystemURLs::getDocumentRoot() . '/Include/Header.php';
                 <span>
                     <?= htmlspecialchars($t['label']) ?>
                     <?php if ($t['is_system']): ?>
-                    <span class="badge bg-secondary ms-2"><?= dgettext('meeting-outlines', 'Built-in') ?></span>
+                    <span class="badge bg-secondary ms-2 text-white"><?= dgettext('meeting-outlines', 'Built-in') ?></span>
                     <?php endif; ?>
                 </span>
                 <?php if (!$t['is_system']): ?>

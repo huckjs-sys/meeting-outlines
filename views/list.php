@@ -54,7 +54,7 @@ require SystemURLs::getDocumentRoot() . '/Include/Header.php';
                         <?php if ($s['status'] === 'published'): ?>
                             <span class="badge bg-success"><?= dgettext('meeting-outlines', 'Published') ?></span>
                         <?php else: ?>
-                            <span class="badge bg-secondary"><?= dgettext('meeting-outlines', 'Draft') ?></span>
+                            <span class="badge bg-secondary text-white"><?= dgettext('meeting-outlines', 'Draft') ?></span>
                         <?php endif; ?>
                     </td>
                     <td class="text-center"><?= (int) $s['item_count'] ?></td>
