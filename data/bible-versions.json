@@ -1,9 +1,8 @@
 {
   "versions": [
-    {"code": "LSG", "name": "Louis Segond (1910)",       "lang": "fr", "local": true},
-    {"code": "FRD", "name": "Darby (français, 1885)",    "lang": "fr", "local": false},
-    {"code": "FRC", "name": "Crampon (1923)",             "lang": "fr", "local": false},
-    {"code": "KJV", "name": "King James (1611)",          "lang": "en", "local": false},
-    {"code": "ASV", "name": "American Standard (1901)",   "lang": "en", "local": false}
+    {"code": "LSG", "name": "Louis Segond (1910)",       "lang": "fr", "getbible": "ls1910"},
+    {"code": "FRD", "name": "Darby (français, 1885)",    "lang": "fr", "getbible": "darby"},
+    {"code": "KJV", "name": "King James (1611)",          "lang": "en", "getbible": "kjv"},
+    {"code": "ASV", "name": "American Standard (1901)",   "lang": "en", "getbible": "asv"}
   ]
 }
