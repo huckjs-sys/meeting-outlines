@@ -178,11 +178,20 @@ $app->group('/meeting-outlines/api', function (RouteCollectorProxy $group) use (
         $data   = $request->getParsedBody();
         $errors = [];
 
+        $allowedTypes    = array_keys(MeetingOutlinesPlugin::getServiceTypes());
+        $allowedStatuses = array_keys(MeetingOutlinesPlugin::getStatusLabels());
+
         if (empty(trim($data['date'] ?? ''))) {
             $errors[] = dgettext('meeting-outlines', 'Meeting date is required.');
         }
         if (empty(trim($data['title'] ?? ''))) {
             $errors[] = dgettext('meeting-outlines', 'Title is required.');
+        }
+        if (!in_array($data['type'] ?? 'sunday', $allowedTypes, true)) {
+            $errors[] = gettext('Invalid meeting type.');
+        }
+        if (!in_array($data['status'] ?? 'draft', $allowedStatuses, true)) {
+            $errors[] = gettext('Invalid status.');
         }
 
         if (!empty($errors)) {
@@ -216,11 +225,20 @@ $app->group('/meeting-outlines/api', function (RouteCollectorProxy $group) use (
         $data   = $request->getParsedBody();
         $errors = [];
 
+        $allowedTypes    = array_keys(MeetingOutlinesPlugin::getServiceTypes());
+        $allowedStatuses = array_keys(MeetingOutlinesPlugin::getStatusLabels());
+
         if (empty(trim($data['date'] ?? ''))) {
             $errors[] = dgettext('meeting-outlines', 'Meeting date is required.');
         }
         if (empty(trim($data['title'] ?? ''))) {
             $errors[] = dgettext('meeting-outlines', 'Title is required.');
+        }
+        if (!in_array($data['type'] ?? 'sunday', $allowedTypes, true)) {
+            $errors[] = gettext('Invalid meeting type.');
+        }
+        if (!in_array($data['status'] ?? 'draft', $allowedStatuses, true)) {
+            $errors[] = gettext('Invalid status.');
         }
 
         if (!empty($errors)) {
@@ -363,8 +381,13 @@ $app->group('/meeting-outlines/api', function (RouteCollectorProxy $group) use (
         $data   = $request->getParsedBody();
         $errors = [];
 
+        $allowedItemTypes = array_keys(MeetingOutlinesPlugin::getItemTypes());
+
         if (empty(trim($data['title'] ?? ''))) {
             $errors[] = dgettext('meeting-outlines', 'Item title is required.');
+        }
+        if (!in_array($data['item_type'] ?? 'other', $allowedItemTypes, true)) {
+            $errors[] = gettext('Invalid item type.');
         }
 
         if (!empty($errors)) {
@@ -406,8 +429,13 @@ $app->group('/meeting-outlines/api', function (RouteCollectorProxy $group) use (
         $data   = $request->getParsedBody();
         $errors = [];
 
+        $allowedItemTypes = array_keys(MeetingOutlinesPlugin::getItemTypes());
+
         if (empty(trim($data['title'] ?? ''))) {
             $errors[] = dgettext('meeting-outlines', 'Item title is required.');
+        }
+        if (!in_array($data['item_type'] ?? 'other', $allowedItemTypes, true)) {
+            $errors[] = gettext('Invalid item type.');
         }
 
         if (!empty($errors)) {
