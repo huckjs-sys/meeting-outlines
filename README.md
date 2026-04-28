@@ -15,12 +15,15 @@ Manage the outlines of church meetings. Create, edit and print meeting programs 
 - Build a program by adding ordered items (drag & drop reordering via SortableJS)
 - Item types: Song, Prayer, Bible Reading, Sermon, Offering, Announcements, Communion, Other
 - Each item can have a title, description, duration and a responsible person
+- **Duplicate a meeting** — copies the full outline (all items) as a new draft in one click
+- **Custom meeting types** — create and delete custom types from Meeting Settings; 4 built-in types (Sunday, Prayer, Special, Other) are protected and cannot be deleted
+- **Email notification** — send the meeting outline to all assigned participants (preacher, president, item responsibles) who have a valid email in the CRM; requires SMTP configured in ChurchCRM
 - **Preachers & Responsibles** linked to ChurchCRM group manager (dropdown selects from configured groups)
 - **Bible reference selector** (book / chapter / from verse / to verse) for Bible Reading items
 - **Bible versions:** LSG 1910 (built-in), Darby, Crampon, KJV, ASV — configurable from Meeting Settings
 - Draft / Published status workflow
-- Clean printable view (standalone page, no CRM chrome)
-- Fully internationalised — all strings go through `gettext()` and are extracted by `npm run locale:build`
+- Clean printable view (standalone page) — shows preacher, responsible person and duration per item; date localised to CRM locale
+- Fully internationalised via plugin-local gettext — add any language without touching core CRM files
 
 ---
 
@@ -34,12 +37,18 @@ meeting-outlines/
 ├── data/
 │   ├── bible-structure.json        ← 66 books, chapter/verse counts (OT + NT)
 │   └── bible-versions.json         ← available Bible versions (LSG, FRD, FRC, KJV, ASV)
+├── locale/
+│   ├── textdomain/                 ← PHP gettext .mo files (plugin-local, independent of core)
+│   │   └── fr_FR/LC_MESSAGES/
+│   │       ├── meeting-outlines.po ← French source strings
+│   │       └── meeting-outlines.mo ← compiled binary (compile with polib, see i18n section)
+│   └── i18n/                       ← JS translations (flat JSON per locale, optional)
 ├── src/
-│   └── MeetingOutlinesPlugin.php      ← main plugin class (boot, activate, uninstall, data access)
+│   └── MeetingOutlinesPlugin.php   ← main plugin class (boot, activate, uninstall, data access)
 ├── routes/
 │   └── routes.php                  ← Slim 4 routes: MVC pages + REST API
 └── views/
-    ├── list.php                    ← list of meetings (DataTables)
+    ├── list.php                    ← list of meetings (DataTables) + duplicate/delete actions
     ├── edit.php                    ← create/edit a meeting + manage its outline items
     ├── settings.php                ← admin settings (groups, Bible version)
     └── print.php                   ← standalone printable meeting outline
@@ -100,7 +109,7 @@ Created automatically on activation, dropped on uninstall.
 | `id` | INT UNSIGNED PK AUTO | |
 | `date` | DATE | Date of the meeting |
 | `title` | VARCHAR(200) | e.g. "Sunday Morning Meeting" |
-| `type` | VARCHAR(50) | `sunday` / `prayer` / `special` / `other` |
+| `type` | VARCHAR(50) | slug from `worship_service_type` (e.g. `sunday`, `prayer`, custom slugs) |
 | `preacher` | VARCHAR(150) | Free-text preacher name (fallback) |
 | `preacher_person_id` | INT UNSIGNED | FK to CRM person (from configured group) |
 | `notes` | TEXT | Internal notes |
@@ -127,6 +136,18 @@ Created automatically on activation, dropped on uninstall.
 | `bible_verse_end` | SMALLINT UNSIGNED | Ending verse (optional) |
 | `created_at` | DATETIME | Auto |
 
+### `worship_service_type`
+
+| Column | Type | Description |
+|---|---|---|
+| `slug` | VARCHAR(50) PK | Unique identifier used as `worship_service.type` value |
+| `label` | VARCHAR(100) | Display label (stored in English for system types, free text for custom) |
+| `is_system` | TINYINT(1) | `1` = built-in (cannot be deleted), `0` = custom |
+| `sort_order` | SMALLINT UNSIGNED | Display order (system types 1–3, custom types default to 99) |
+
+Seeded on activation with the 4 built-in types (`sunday`, `prayer`, `special`, `other`).
+`runMigrations()` also creates and seeds this table idempotently so existing installs get it without re-activation.
+
 ---
 
 ## Routes
@@ -151,11 +172,15 @@ All routes are prefixed with `/plugins/` by the ChurchCRM route loader.
 | POST | `/plugins/meeting-outlines/api/services` | Create a meeting |
 | PUT | `/plugins/meeting-outlines/api/services/{id}` | Update a meeting |
 | DELETE | `/plugins/meeting-outlines/api/services/{id}` | Delete a meeting (cascades items) |
+| POST | `/plugins/meeting-outlines/api/services/{id}/duplicate` | Duplicate a meeting + all its items (new draft) |
+| POST | `/plugins/meeting-outlines/api/services/{id}/notify` | Send outline by email to all participants with a valid email |
 | POST | `/plugins/meeting-outlines/api/services/{id}/items` | Add an item |
 | PUT | `/plugins/meeting-outlines/api/items/{id}` | Update an item |
 | DELETE | `/plugins/meeting-outlines/api/items/{id}` | Delete an item |
 | POST | `/plugins/meeting-outlines/api/services/{id}/items/reorder` | Reorder items (`{"ids":[3,1,2]}`) |
 | GET | `/plugins/meeting-outlines/api/groups/{id}/members` | List members of a CRM group |
+| POST | `/plugins/meeting-outlines/api/service-types` | Create a custom meeting type (`{"label":"..."}`) |
+| DELETE | `/plugins/meeting-outlines/api/service-types/{slug}` | Delete a custom meeting type (blocked if in use) |
 
 All API endpoints require `AdminRoleAuthMiddleware`.
 
@@ -170,6 +195,7 @@ Accessible via **Church Meetings → Meeting Settings**.
 | Preachers group | CRM group whose members appear in the Preacher dropdown |
 | Responsibles group | CRM group whose members appear in the Responsible dropdown per item |
 | Bible version | Default version used in print view (LSG, FRD, FRC, KJV, ASV) |
+| Meeting Types | Create / delete custom meeting types; 4 built-in types are read-only |
 
 If no group is configured, the Preacher / Responsible fields fall back to a free-text input.
 
@@ -198,41 +224,58 @@ an external source (future feature).
 
 ## Internationalisation
 
-All user-facing strings use PHP `gettext()`. No separate translation file is needed —
-ChurchCRM's build process extracts them automatically.
-
-```bash
-# After adding or changing strings in this plugin, run from the repo root:
-npm run locale:build
-```
+This plugin uses **plugin-local gettext** (PR #8657 compliance) — completely independent
+of the ChurchCRM core `messages` domain and the POeditor workflow.
 
 **Rules followed in this plugin:**
-- PHP views and class methods: `gettext('English string')`
-- JavaScript strings in views: injected from PHP via `json_encode(gettext('...'))`
-  so they are extracted by `xgettext` along with the rest of the PHP source
-- `help.json`: strings written in English and extracted by `locale-build-plugin-help.js`
-- Plural forms: `ngettext('%d item', '%d items', $count)` (not currently used but the
-  pattern to follow if needed)
+- PHP views and class methods: `dgettext('meeting-outlines', 'English string')`
+- Plural forms: `dngettext('meeting-outlines', '%d item', '%d items', $count)`
+- JavaScript strings: injected from PHP via `json_encode(dgettext('meeting-outlines', '...'))`
+  — no client-side lookup needed
 
-### Key strings used in this plugin
+**Plural forms in the `.po` file** must use the `msgid_plural` syntax — a simple `msgid` entry
+will never be picked up by `dngettext()`:
 
-Navigation / headings: `Church Meetings`, `Meeting Outlines`, `Meeting Settings`,
-`Meetings`, `Add Meeting`, `Edit Meeting`, `Meeting Outline`
+```po
+# ✅ CORRECT — dngettext() will use msgstr[0] for n=1 and msgstr[1] for n>1
+msgid "%d item"
+msgid_plural "%d items"
+msgstr[0] "%d élément"
+msgstr[1] "%d éléments"
 
-Meeting fields: `Meeting Date`, `Title`, `Type`, `Preacher`, `Notes`, `Status`,
-`Draft`, `Published`
+# ❌ WRONG — plural form stays in English
+msgid "%d item"
+msgstr "%d élément"
+```
 
-Meeting types: `Sunday Meeting`, `Prayer Meeting`, `Special Meeting`, `Other`
+### Adding or updating a translation
 
-Item fields: `Item Type`, `Title`, `Responsible`, `Duration (minutes)`, `Description`,
-`Bible Reference`, `Book`, `Chapter`, `From verse`, `To verse`
+1. Edit `locale/textdomain/{locale}/LC_MESSAGES/meeting-outlines.po`
+2. Compile to `.mo` using [polib](https://pypi.org/project/polib/) (Python):
 
-Item types: `Song`, `Prayer`, `Bible Reading`, `Sermon`, `Offering`, `Announcements`,
-`Communion`, `Other`
+```python
+import polib
+po = polib.pofile('locale/textdomain/fr_FR/LC_MESSAGES/meeting-outlines.po', encoding='utf-8')
+po.save_as_mofile('locale/textdomain/fr_FR/LC_MESSAGES/meeting-outlines.mo')
+```
 
-Messages: `Meeting saved successfully.`, `Meeting deleted.`, `Item added.`,
-`Item updated.`, `Item deleted.`, `No meetings found.`, `No items added yet.`,
-`Are you sure you want to delete this meeting?`, `Drag to reorder`
+Or with the standard GNU gettext toolchain if available:
+```bash
+msgfmt locale/textdomain/fr_FR/LC_MESSAGES/meeting-outlines.po \
+       -o locale/textdomain/fr_FR/LC_MESSAGES/meeting-outlines.mo
+```
+
+### Adding a new language
+
+Create the directory structure and `.po` file:
+```
+locale/textdomain/{locale}/LC_MESSAGES/meeting-outlines.po
+```
+Translate all `msgid` entries, compile to `.mo`, and commit both files.
+`PluginLocalization::bindPhpDomains()` will pick it up automatically at boot.
+
+> **Never** add strings from this plugin to the core `locale/messages.po`
+> or submit them to POeditor — they belong here only.
 
 ---
 
@@ -308,7 +351,7 @@ print dialog produces a clean output without navigation, buttons or page chrome.
 
 Disable then uninstall the plugin from **Admin → Plugins**.
 
-`uninstall()` drops both tables (`worship_service_item` first, then `worship_service`).
-**All meeting data will be permanently deleted.**
+`uninstall()` drops all three tables (`worship_service_item`, `worship_service`, `worship_service_type`).
+**All meeting data and custom types will be permanently deleted.**
 
 Also remove the four `plugin.meeting-outlines.*` lines from `SystemConfig.php`.

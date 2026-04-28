@@ -1,0 +1,450 @@
+# Plugin meeting-outlines — French translations
+# Copyright (C) 2026 Eoles Conseil
+# MIME-Version: 1.0
+# Content-Type: text/plain; charset=UTF-8
+# Content-Transfer-Encoding: 8bit
+# Language: fr_FR
+# Plural-Forms: nplurals=2; plural=(n > 1);
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: fr_FR\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+msgid "Meeting Outlines"
+msgstr "Déroulements de réunion"
+
+msgid "Manage the outlines of church meetings."
+msgstr "Gérez les déroulements des réunions d'église."
+
+msgid "Church Meetings"
+msgstr "Réunions d'église"
+
+msgid "Meeting Settings"
+msgstr "Paramètres des réunions"
+
+msgid "Sunday Meeting"
+msgstr "Réunion du dimanche"
+
+msgid "Prayer Meeting"
+msgstr "Réunion de prière"
+
+msgid "Special Meeting"
+msgstr "Réunion spéciale"
+
+msgid "Other"
+msgstr "Autre"
+
+msgid "Song"
+msgstr "Cantique"
+
+msgid "Prayer"
+msgstr "Prière"
+
+msgid "Bible Reading"
+msgstr "Lecture biblique"
+
+msgid "Sermon"
+msgstr "Sermon"
+
+msgid "Offering"
+msgstr "Offrande"
+
+msgid "Announcements"
+msgstr "Annonces"
+
+msgid "Communion"
+msgstr "Communion"
+
+msgid "Draft"
+msgstr "Brouillon"
+
+msgid "Published"
+msgstr "Publié"
+
+msgid "Add Meeting"
+msgstr "Ajouter une réunion"
+
+msgid "Edit Meeting"
+msgstr "Modifier la réunion"
+
+msgid "Meeting Outline"
+msgstr "Déroulement de la réunion"
+
+msgid "Settings saved successfully."
+msgstr "Paramètres enregistrés avec succès."
+
+msgid "Meeting date is required."
+msgstr "La date de la réunion est obligatoire."
+
+msgid "Title is required."
+msgstr "Le titre est obligatoire."
+
+msgid "Meeting saved successfully."
+msgstr "Réunion enregistrée avec succès."
+
+msgid "Failed to save meeting."
+msgstr "Échec de l'enregistrement de la réunion."
+
+msgid "Meeting not found."
+msgstr "Réunion introuvable."
+
+msgid "Meeting deleted."
+msgstr "Réunion supprimée."
+
+msgid "Failed to delete meeting."
+msgstr "Échec de la suppression de la réunion."
+
+msgid "Item title is required."
+msgstr "Le titre de l'élément est obligatoire."
+
+msgid "Item added."
+msgstr "Élément ajouté."
+
+msgid "Failed to add item."
+msgstr "Échec de l'ajout de l'élément."
+
+msgid "Item not found."
+msgstr "Élément introuvable."
+
+msgid "Item updated."
+msgstr "Élément mis à jour."
+
+msgid "Failed to update item."
+msgstr "Échec de la mise à jour de l'élément."
+
+msgid "Item deleted."
+msgstr "Élément supprimé."
+
+msgid "Failed to delete item."
+msgstr "Échec de la suppression de l'élément."
+
+msgid "Meeting duplicated."
+msgstr "Réunion dupliquée."
+
+msgid "Failed to duplicate meeting."
+msgstr "Échec de la duplication de la réunion."
+
+msgid "Invalid data."
+msgstr "Données invalides."
+
+msgid "Meetings"
+msgstr "Réunions"
+
+msgid "Date"
+msgstr "Date"
+
+msgid "Title"
+msgstr "Titre"
+
+msgid "Type"
+msgstr "Type"
+
+msgid "Preacher"
+msgstr "Prédicateur"
+
+msgid "President"
+msgstr "Président"
+
+msgid "Status"
+msgstr "Statut"
+
+msgid "Items"
+msgstr "Éléments"
+
+msgid "Actions"
+msgstr "Actions"
+
+msgid "Edit Service"
+msgstr "Modifier la réunion"
+
+msgid "Print Order"
+msgstr "Imprimer"
+
+msgid "Copy of"
+msgstr "Copie de"
+
+msgid "Duplicate Service"
+msgstr "Dupliquer la réunion"
+
+msgid "Delete Service"
+msgstr "Supprimer la réunion"
+
+msgid "Are you sure you want to delete this meeting?"
+msgstr "Êtes-vous sûr de vouloir supprimer cette réunion ?"
+
+msgid "Duplicate this meeting and all its items?"
+msgstr "Dupliquer cette réunion et tous ses éléments ?"
+
+msgid "An error occurred. Please try again."
+msgstr "Une erreur est survenue. Veuillez réessayer."
+
+msgid "No services found."
+msgstr "Aucune réunion trouvée."
+
+msgid "Meeting Date"
+msgstr "Date de la réunion"
+
+msgid "e.g., Sunday Morning Meeting"
+msgstr "ex. Culte du dimanche matin"
+
+msgid "— Select a preacher —"
+msgstr "— Sélectionner un prédicateur —"
+
+msgid "No preacher group configured"
+msgstr "Aucun groupe de prédicateurs configuré"
+
+msgid "Configure a group in Settings"
+msgstr "Configurez un groupe dans les paramètres"
+
+msgid "— Select a president —"
+msgstr "— Sélectionner un président —"
+
+msgid "Notes"
+msgstr "Notes"
+
+msgid "Save"
+msgstr "Enregistrer"
+
+msgid "Cancel"
+msgstr "Annuler"
+
+msgid "Add Item"
+msgstr "Ajouter un élément"
+
+msgid "No items added yet."
+msgstr "Aucun élément ajouté pour l'instant."
+
+msgid "Drag to reorder"
+msgstr "Glisser pour réorganiser"
+
+msgid "min"
+msgstr "min"
+
+msgid "%d item"
+msgid_plural "%d items"
+msgstr[0] "%d élément"
+msgstr[1] "%d éléments"
+
+msgid "Item Type"
+msgstr "Type d'élément"
+
+msgid "Bible Reference"
+msgstr "Référence biblique"
+
+msgid "Book"
+msgstr "Livre"
+
+msgid "— Select a book —"
+msgstr "— Sélectionner un livre —"
+
+msgid "Old Testament"
+msgstr "Ancien Testament"
+
+msgid "New Testament"
+msgstr "Nouveau Testament"
+
+msgid "Chapter"
+msgstr "Chapitre"
+
+msgid "—"
+msgstr ""
+
+msgid "From verse"
+msgstr "Du verset"
+
+msgid "To verse"
+msgstr "Au verset"
+
+msgid "Responsible"
+msgstr "Responsable"
+
+msgid "— Select a responsible —"
+msgstr "— Sélectionner un responsable —"
+
+msgid "No responsible group configured"
+msgstr "Aucun groupe de responsables configuré"
+
+msgid "Duration (minutes)"
+msgstr "Durée (minutes)"
+
+msgid "Description"
+msgstr "Description"
+
+msgid "Edit Item"
+msgstr "Modifier l'élément"
+
+msgid "Are you sure you want to delete this item?"
+msgstr "Êtes-vous sûr de vouloir supprimer cet élément ?"
+
+msgid "— Select a chapter —"
+msgstr "— Sélectionner un chapitre —"
+
+msgid "— Select a verse —"
+msgstr "— Sélectionner un verset —"
+
+msgid "items"
+msgstr "articles"
+
+msgid "item"
+msgstr "article"
+
+msgid "Back"
+msgstr "Revenir"
+
+msgid "Print"
+msgstr "Imprimer"
+
+msgid "Preachers"
+msgstr "Prédicateurs"
+
+msgid "Group linked to Preachers"
+msgstr "Groupe lié aux prédicateurs"
+
+msgid "— No group selected —"
+msgstr "— Aucun groupe sélectionné —"
+
+msgid "Members of this group will appear in the Preacher dropdown when creating a service."
+msgstr "Les membres de ce groupe apparaîtront dans la liste déroulante Prédicateur lors de la création d'une réunion."
+
+msgid "No groups found."
+msgstr "Aucun groupe trouvé."
+
+msgid "Create a group first."
+msgstr "Créez d'abord un groupe."
+
+msgid "Members in this group"
+msgstr "Membres de ce groupe"
+
+msgid "Responsibles"
+msgstr "Responsables"
+
+msgid "Group linked to Responsibles"
+msgstr "Groupe lié aux responsables"
+
+msgid "Members of this group will appear in the Responsible dropdown for each item in the order of service."
+msgstr "Les membres de ce groupe apparaîtront dans la liste déroulante Responsable pour chaque élément du déroulement."
+
+msgid "Bible Version"
+msgstr "Version biblique"
+
+msgid "Default Bible version"
+msgstr "Version biblique par défaut"
+
+msgid "built-in"
+msgstr "intégrée"
+
+msgid "This version is shown in the print view and used for Bible reading references."
+msgstr "Cette version est affichée dans la vue d'impression et utilisée pour les références de lecture biblique."
+
+msgid "Available versions"
+msgstr "Versions disponibles"
+
+msgid "Code"
+msgstr "Code"
+
+msgid "Name"
+msgstr "Nom"
+
+msgid "Language"
+msgstr "Langue"
+
+msgid "Built-in"
+msgstr "Intégrée"
+
+msgid "Save Settings"
+msgstr "Enregistrer les réglages"
+
+msgid "Back to Meeting Outlines"
+msgstr "Retour aux déroulements de réunion"
+
+msgid "Notify Participants"
+msgstr "Notifier les participants"
+
+msgid "SMTP not configured — configure mail settings first."
+msgstr "SMTP non configuré — veuillez d'abord configurer les paramètres d'envoi."
+
+msgid "Failed to send notification."
+msgstr "Échec de l'envoi de la notification."
+
+msgid "%d email(s) sent."
+msgstr "%d e-mail(s) envoyé(s)."
+
+msgid "%d participant(s) skipped (no email)."
+msgstr "%d participant(s) ignoré(s) (pas d'adresse e-mail)."
+
+msgid "No participants with a valid email address found."
+msgstr "Aucun participant avec une adresse e-mail valide."
+
+msgid "Send the meeting outline to all participants?"
+msgstr "Envoyer le déroulement de la réunion à tous les participants ?"
+
+msgid "Meeting Types"
+msgstr "Types de réunion"
+
+msgid "Built-in types cannot be deleted. Custom types can only be deleted if no meeting uses them."
+msgstr "Les types intégrés ne peuvent pas être supprimés. Les types personnalisés ne peuvent être supprimés que si aucune réunion ne les utilise."
+
+msgid "New type label…"
+msgstr "Libellé du nouveau type…"
+
+msgid "Add"
+msgstr "Ajouter"
+
+msgid "Are you sure you want to delete this meeting type?"
+msgstr "Êtes-vous sûr de vouloir supprimer ce type de réunion ?"
+
+msgid "Meeting type added."
+msgstr "Type de réunion ajouté."
+
+msgid "Meeting type deleted."
+msgstr "Type de réunion supprimé."
+
+msgid "Meeting type not found."
+msgstr "Type de réunion introuvable."
+
+msgid "Built-in types cannot be deleted."
+msgstr "Les types intégrés ne peuvent pas être supprimés."
+
+msgid "This meeting type is in use and cannot be deleted."
+msgstr "Ce type de réunion est utilisé et ne peut pas être supprimé."
+
+msgid "Label is required."
+msgstr "Le libellé est obligatoire."
+
+msgid "SMTP is not configured."
+msgstr "Le serveur SMTP n'est pas configuré."
+
+msgid "Bible Readings"
+msgstr "Lectures bibliques"
+
+msgid "Download"
+msgstr "Télécharger"
+
+msgid "Download now"
+msgstr "Télécharger maintenant"
+
+msgid "Downloading Bible text"
+msgstr "Téléchargement du texte biblique"
+
+msgid "Preparing…"
+msgstr "Préparation…"
+
+msgid "Download complete!"
+msgstr "Téléchargement terminé !"
+
+msgid "%d error(s). Retry by clicking Download again."
+msgstr "%d erreur(s). Relancez en cliquant à nouveau sur Télécharger."
+
+msgid "Book %1$d / %2$d"
+msgstr "Livre %1$d / %2$d"
+
+msgid "Bible text not available"
+msgstr "Texte biblique non disponible"
+
+msgid "The version \"%s\" has been saved but its text is not yet downloaded. Download it to display full verses in the print view."
+msgstr "La version « %s » a été enregistrée mais son texte n'est pas encore téléchargé. Téléchargez-le pour afficher les versets complets dans l'impression."
+
+msgid "This version is not yet downloaded. Save and then download it."
+msgstr "Cette version n'est pas encore téléchargée. Enregistrez puis téléchargez-la."

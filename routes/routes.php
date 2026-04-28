@@ -24,9 +24,9 @@ $app->get('/meeting-outlines/services', function (Request $request, Response $re
 
     return $renderer->render($response, 'list.php', [
         'sRootPath' => SystemURLs::getRootPath(),
-        'sPageTitle' => gettext('Meeting Outlines'),
+        'sPageTitle' => dgettext('meeting-outlines', 'Meeting Outlines'),
         'services'  => $plugin->getServices(),
-        'serviceTypes' => MeetingOutlinesPlugin::getServiceTypes(),
+        'serviceTypes' => $plugin->getServiceTypes(),
         'statusLabels' => MeetingOutlinesPlugin::getStatusLabels(),
     ]);
 })->add(AdminRoleAuthMiddleware::class);
@@ -37,10 +37,10 @@ $app->get('/meeting-outlines/services/new', function (Request $request, Response
 
     return $renderer->render($response, 'edit.php', [
         'sRootPath'          => SystemURLs::getRootPath(),
-        'sPageTitle'         => gettext('Add Meeting'),
+        'sPageTitle'         => dgettext('meeting-outlines', 'Add Meeting'),
         'service'            => null,
         'items'              => [],
-        'serviceTypes'       => MeetingOutlinesPlugin::getServiceTypes(),
+        'serviceTypes'       => $plugin->getServiceTypes(),
         'itemTypes'          => MeetingOutlinesPlugin::getItemTypes(),
         'statusLabels'       => MeetingOutlinesPlugin::getStatusLabels(),
         'preachersMembers'   => $plugin->getGroupMembers($plugin->getPreachersGroupId()),
@@ -62,10 +62,10 @@ $app->get('/meeting-outlines/services/{id:[0-9]+}/edit', function (Request $requ
 
     return $renderer->render($response, 'edit.php', [
         'sRootPath'          => SystemURLs::getRootPath(),
-        'sPageTitle'         => gettext('Edit Meeting'),
+        'sPageTitle'         => dgettext('meeting-outlines', 'Edit Meeting'),
         'service'            => $service,
         'items'              => $plugin->getServiceItems((int) $args['id']),
-        'serviceTypes'       => MeetingOutlinesPlugin::getServiceTypes(),
+        'serviceTypes'       => $plugin->getServiceTypes(),
         'itemTypes'          => MeetingOutlinesPlugin::getItemTypes(),
         'statusLabels'       => MeetingOutlinesPlugin::getStatusLabels(),
         'preachersMembers'   => $plugin->getGroupMembers($plugin->getPreachersGroupId()),
@@ -83,31 +83,39 @@ $app->get('/meeting-outlines/services/{id:[0-9]+}/print', function (Request $req
         return $response->withStatus(404);
     }
 
-    $items        = $plugin->getServiceItems((int) $args['id']);
-    $bibleVersion = $plugin->getBibleVersion();
+    $items = $plugin->getServiceItems((int) $args['id']);
 
-    foreach ($items as &$item) {
-        if ($item['item_type'] === 'bible_reading' && !empty($item['bible_book']) && !empty($item['bible_chapter'])) {
-            $verses = $plugin->getBibleChapter($bibleVersion, (int) $item['bible_book'], (int) $item['bible_chapter']);
-            $start  = (int) ($item['bible_verse_start'] ?? 1);
-            $end    = (int) ($item['bible_verse_end'] ?: $start);
-            $item['verse_texts'] = array_values(
-                array_filter($verses, fn($v) => $v['num'] >= $start && $v['num'] <= $end)
+    // Pré-calcul des textes bibliques pour les lectures (dégradation gracieuse si absent)
+    $bibleVerses = [];
+    foreach ($items as $item) {
+        if ($item['item_type'] === 'bible_reading'
+            && !empty($item['bible_book'])
+            && !empty($item['bible_chapter'])
+            && !empty($item['bible_verse_start'])
+        ) {
+            $verses = $plugin->getBibleVerses(
+                (int) $item['bible_book'],
+                (int) $item['bible_chapter'],
+                (int) $item['bible_verse_start'],
+                !empty($item['bible_verse_end']) ? (int) $item['bible_verse_end'] : null
             );
+            if ($verses !== null) {
+                $bibleVerses[$item['id']] = $verses;
+            }
         }
     }
-    unset($item);
 
     $renderer = new PhpRenderer(__DIR__ . '/../views/');
 
     return $renderer->render($response, 'print.php', [
         'sRootPath'    => SystemURLs::getRootPath(),
-        'sPageTitle'   => gettext('Meeting Outline'),
+        'sPageTitle'   => dgettext('meeting-outlines', 'Meeting Outline'),
         'service'      => $service,
         'items'        => $items,
-        'serviceTypes' => MeetingOutlinesPlugin::getServiceTypes(),
+        'serviceTypes' => $plugin->getServiceTypes(),
         'itemTypes'    => MeetingOutlinesPlugin::getItemTypes(),
-        'bibleVersion' => $bibleVersion,
+        'plugin'       => $plugin,
+        'bibleVerses'  => $bibleVerses,
     ]);
 })->add(AdminRoleAuthMiddleware::class);
 
@@ -117,7 +125,7 @@ $app->get('/meeting-outlines/settings', function (Request $request, Response $re
 
     return $renderer->render($response, 'settings.php', [
         'sRootPath'           => SystemURLs::getRootPath(),
-        'sPageTitle'          => gettext('Meeting Settings'),
+        'sPageTitle'          => dgettext('meeting-outlines', 'Meeting Settings'),
         'allGroups'           => $plugin->getAllGroups(),
         'preachersGroupId'    => $plugin->getPreachersGroupId(),
         'responsiblesGroupId' => $plugin->getResponsiblesGroupId(),
@@ -125,7 +133,10 @@ $app->get('/meeting-outlines/settings', function (Request $request, Response $re
         'responsiblesMembers' => $plugin->getGroupMembers($plugin->getResponsiblesGroupId()),
         'bibleVersions'       => $plugin->getBibleVersions(),
         'currentBibleVersion' => $plugin->getBibleVersion(),
+        'bibleStructure'      => $plugin->getBibleStructure(),
+        'allServiceTypes'     => $plugin->getAllServiceTypes(),
         'successMessage'      => '',
+        'needsDownload'       => false,
     ]);
 })->add(AdminRoleAuthMiddleware::class);
 
@@ -134,19 +145,25 @@ $app->post('/meeting-outlines/settings', function (Request $request, Response $r
     $data = $request->getParsedBody();
     $plugin->saveSettings($data);
 
+    $currentVersion = $plugin->getBibleVersion();
+    $needsDownload  = !$plugin->isBibleVersionAvailable($currentVersion);
+
     $renderer = new PhpRenderer(__DIR__ . '/../views/');
 
     return $renderer->render($response, 'settings.php', [
         'sRootPath'           => SystemURLs::getRootPath(),
-        'sPageTitle'          => gettext('Meeting Settings'),
+        'sPageTitle'          => dgettext('meeting-outlines', 'Meeting Settings'),
         'allGroups'           => $plugin->getAllGroups(),
         'preachersGroupId'    => $plugin->getPreachersGroupId(),
         'responsiblesGroupId' => $plugin->getResponsiblesGroupId(),
         'preachersMembers'    => $plugin->getGroupMembers($plugin->getPreachersGroupId()),
         'responsiblesMembers' => $plugin->getGroupMembers($plugin->getResponsiblesGroupId()),
         'bibleVersions'       => $plugin->getBibleVersions(),
-        'currentBibleVersion' => $plugin->getBibleVersion(),
-        'successMessage'      => gettext('Settings saved successfully.'),
+        'currentBibleVersion' => $currentVersion,
+        'bibleStructure'      => $plugin->getBibleStructure(),
+        'allServiceTypes'     => $plugin->getAllServiceTypes(),
+        'successMessage'      => dgettext('meeting-outlines', 'Settings saved successfully.'),
+        'needsDownload'       => $needsDownload,
     ]);
 })->add(AdminRoleAuthMiddleware::class);
 
@@ -162,10 +179,10 @@ $app->group('/meeting-outlines/api', function (RouteCollectorProxy $group) use (
         $errors = [];
 
         if (empty(trim($data['date'] ?? ''))) {
-            $errors[] = gettext('Meeting date is required.');
+            $errors[] = dgettext('meeting-outlines', 'Meeting date is required.');
         }
         if (empty(trim($data['title'] ?? ''))) {
-            $errors[] = gettext('Title is required.');
+            $errors[] = dgettext('meeting-outlines', 'Title is required.');
         }
 
         if (!empty($errors)) {
@@ -186,11 +203,11 @@ $app->group('/meeting-outlines/api', function (RouteCollectorProxy $group) use (
 
             return SlimUtils::renderJSON($response, [
                 'success' => true,
-                'message' => gettext('Meeting saved successfully.'),
+                'message' => dgettext('meeting-outlines', 'Meeting saved successfully.'),
                 'id'      => $id,
             ]);
         } catch (\Throwable $e) {
-            return SlimUtils::renderErrorJSON($response, gettext('Failed to save meeting.'), [], 500, $e, $request);
+            return SlimUtils::renderErrorJSON($response, dgettext('meeting-outlines', 'Failed to save meeting.'), [], 500, $e, $request);
         }
     });
 
@@ -200,10 +217,10 @@ $app->group('/meeting-outlines/api', function (RouteCollectorProxy $group) use (
         $errors = [];
 
         if (empty(trim($data['date'] ?? ''))) {
-            $errors[] = gettext('Meeting date is required.');
+            $errors[] = dgettext('meeting-outlines', 'Meeting date is required.');
         }
         if (empty(trim($data['title'] ?? ''))) {
-            $errors[] = gettext('Title is required.');
+            $errors[] = dgettext('meeting-outlines', 'Title is required.');
         }
 
         if (!empty($errors)) {
@@ -212,7 +229,7 @@ $app->group('/meeting-outlines/api', function (RouteCollectorProxy $group) use (
 
         $service = $plugin->getService((int) $args['id']);
         if ($service === null) {
-            return SlimUtils::renderJSON($response, ['success' => false, 'message' => gettext('Meeting not found.')], 404);
+            return SlimUtils::renderJSON($response, ['success' => false, 'message' => dgettext('meeting-outlines', 'Meeting not found.')], 404);
         }
 
         try {
@@ -229,10 +246,85 @@ $app->group('/meeting-outlines/api', function (RouteCollectorProxy $group) use (
 
             return SlimUtils::renderJSON($response, [
                 'success' => true,
-                'message' => gettext('Meeting saved successfully.'),
+                'message' => dgettext('meeting-outlines', 'Meeting saved successfully.'),
             ]);
         } catch (\Throwable $e) {
-            return SlimUtils::renderErrorJSON($response, gettext('Failed to save meeting.'), [], 500, $e, $request);
+            return SlimUtils::renderErrorJSON($response, dgettext('meeting-outlines', 'Failed to save meeting.'), [], 500, $e, $request);
+        }
+    });
+
+    // POST /plugins/meeting-outlines/api/service-types — créer un type personnalisé
+    $group->post('/service-types', function (Request $request, Response $response) use ($plugin): Response {
+        $data  = $request->getParsedBody();
+        $label = trim($data['label'] ?? '');
+
+        if ($label === '') {
+            return SlimUtils::renderJSON($response, ['success' => false, 'message' => dgettext('meeting-outlines', 'Label is required.')], 400);
+        }
+
+        try {
+            $slug = $plugin->createServiceType($label);
+
+            return SlimUtils::renderJSON($response, [
+                'success' => true,
+                'message' => dgettext('meeting-outlines', 'Meeting type added.'),
+                'slug'    => $slug,
+                'label'   => $label,
+            ]);
+        } catch (\Throwable $e) {
+            return SlimUtils::renderErrorJSON($response, $e->getMessage(), [], 400, $e, $request);
+        }
+    });
+
+    // DELETE /plugins/meeting-outlines/api/service-types/{slug}
+    $group->delete('/service-types/{slug}', function (Request $request, Response $response, array $args) use ($plugin): Response {
+        $slug = $args['slug'];
+
+        try {
+            $plugin->deleteServiceType($slug);
+
+            return SlimUtils::renderJSON($response, [
+                'success' => true,
+                'message' => dgettext('meeting-outlines', 'Meeting type deleted.'),
+            ]);
+        } catch (\Throwable $e) {
+            return SlimUtils::renderErrorJSON($response, $e->getMessage(), [], 400, $e, $request);
+        }
+    });
+
+    // POST /plugins/meeting-outlines/api/services/{id}/notify — envoyer le déroulement par e-mail
+    $group->post('/services/{id:[0-9]+}/notify', function (Request $request, Response $response, array $args) use ($plugin): Response {
+        $service = $plugin->getService((int) $args['id']);
+        if ($service === null) {
+            return SlimUtils::renderJSON($response, ['success' => false, 'message' => dgettext('meeting-outlines', 'Meeting not found.')], 404);
+        }
+
+        try {
+            $result = $plugin->sendServiceNotification((int) $args['id']);
+
+            return SlimUtils::renderJSON($response, array_merge(['success' => true], $result));
+        } catch (\Throwable $e) {
+            return SlimUtils::renderErrorJSON($response, dgettext('meeting-outlines', 'Failed to send notification.'), [], 500, $e, $request);
+        }
+    });
+
+    // POST /plugins/meeting-outlines/api/services/{id}/duplicate
+    $group->post('/services/{id:[0-9]+}/duplicate', function (Request $request, Response $response, array $args) use ($plugin): Response {
+        $service = $plugin->getService((int) $args['id']);
+        if ($service === null) {
+            return SlimUtils::renderJSON($response, ['success' => false, 'message' => dgettext('meeting-outlines', 'Meeting not found.')], 404);
+        }
+
+        try {
+            $newId = $plugin->duplicateService((int) $args['id']);
+
+            return SlimUtils::renderJSON($response, [
+                'success' => true,
+                'message' => dgettext('meeting-outlines', 'Meeting duplicated.'),
+                'id'      => $newId,
+            ]);
+        } catch (\Throwable $e) {
+            return SlimUtils::renderErrorJSON($response, dgettext('meeting-outlines', 'Failed to duplicate meeting.'), [], 500, $e, $request);
         }
     });
 
@@ -240,7 +332,7 @@ $app->group('/meeting-outlines/api', function (RouteCollectorProxy $group) use (
     $group->delete('/services/{id:[0-9]+}', function (Request $request, Response $response, array $args) use ($plugin): Response {
         $service = $plugin->getService((int) $args['id']);
         if ($service === null) {
-            return SlimUtils::renderJSON($response, ['success' => false, 'message' => gettext('Meeting not found.')], 404);
+            return SlimUtils::renderJSON($response, ['success' => false, 'message' => dgettext('meeting-outlines', 'Meeting not found.')], 404);
         }
 
         try {
@@ -248,10 +340,10 @@ $app->group('/meeting-outlines/api', function (RouteCollectorProxy $group) use (
 
             return SlimUtils::renderJSON($response, [
                 'success' => true,
-                'message' => gettext('Meeting deleted.'),
+                'message' => dgettext('meeting-outlines', 'Meeting deleted.'),
             ]);
         } catch (\Throwable $e) {
-            return SlimUtils::renderErrorJSON($response, gettext('Failed to delete meeting.'), [], 500, $e, $request);
+            return SlimUtils::renderErrorJSON($response, dgettext('meeting-outlines', 'Failed to delete meeting.'), [], 500, $e, $request);
         }
     });
 
@@ -265,14 +357,14 @@ $app->group('/meeting-outlines/api', function (RouteCollectorProxy $group) use (
         $service   = $plugin->getService($serviceId);
 
         if ($service === null) {
-            return SlimUtils::renderJSON($response, ['success' => false, 'message' => gettext('Meeting not found.')], 404);
+            return SlimUtils::renderJSON($response, ['success' => false, 'message' => dgettext('meeting-outlines', 'Meeting not found.')], 404);
         }
 
         $data   = $request->getParsedBody();
         $errors = [];
 
         if (empty(trim($data['title'] ?? ''))) {
-            $errors[] = gettext('Item title is required.');
+            $errors[] = dgettext('meeting-outlines', 'Item title is required.');
         }
 
         if (!empty($errors)) {
@@ -296,11 +388,11 @@ $app->group('/meeting-outlines/api', function (RouteCollectorProxy $group) use (
 
             return SlimUtils::renderJSON($response, [
                 'success' => true,
-                'message' => gettext('Item added.'),
+                'message' => dgettext('meeting-outlines', 'Item added.'),
                 'item'    => $item,
             ]);
         } catch (\Throwable $e) {
-            return SlimUtils::renderErrorJSON($response, gettext('Failed to add item.'), [], 500, $e, $request);
+            return SlimUtils::renderErrorJSON($response, dgettext('meeting-outlines', 'Failed to add item.'), [], 500, $e, $request);
         }
     });
 
@@ -308,14 +400,14 @@ $app->group('/meeting-outlines/api', function (RouteCollectorProxy $group) use (
     $group->put('/items/{id:[0-9]+}', function (Request $request, Response $response, array $args) use ($plugin): Response {
         $item = $plugin->getItem((int) $args['id']);
         if ($item === null) {
-            return SlimUtils::renderJSON($response, ['success' => false, 'message' => gettext('Item not found.')], 404);
+            return SlimUtils::renderJSON($response, ['success' => false, 'message' => dgettext('meeting-outlines', 'Item not found.')], 404);
         }
 
         $data   = $request->getParsedBody();
         $errors = [];
 
         if (empty(trim($data['title'] ?? ''))) {
-            $errors[] = gettext('Item title is required.');
+            $errors[] = dgettext('meeting-outlines', 'Item title is required.');
         }
 
         if (!empty($errors)) {
@@ -338,11 +430,11 @@ $app->group('/meeting-outlines/api', function (RouteCollectorProxy $group) use (
 
             return SlimUtils::renderJSON($response, [
                 'success' => true,
-                'message' => gettext('Item updated.'),
+                'message' => dgettext('meeting-outlines', 'Item updated.'),
                 'item'    => $plugin->getItem((int) $args['id']),
             ]);
         } catch (\Throwable $e) {
-            return SlimUtils::renderErrorJSON($response, gettext('Failed to update item.'), [], 500, $e, $request);
+            return SlimUtils::renderErrorJSON($response, dgettext('meeting-outlines', 'Failed to update item.'), [], 500, $e, $request);
         }
     });
 
@@ -350,7 +442,7 @@ $app->group('/meeting-outlines/api', function (RouteCollectorProxy $group) use (
     $group->delete('/items/{id:[0-9]+}', function (Request $request, Response $response, array $args) use ($plugin): Response {
         $item = $plugin->getItem((int) $args['id']);
         if ($item === null) {
-            return SlimUtils::renderJSON($response, ['success' => false, 'message' => gettext('Item not found.')], 404);
+            return SlimUtils::renderJSON($response, ['success' => false, 'message' => dgettext('meeting-outlines', 'Item not found.')], 404);
         }
 
         try {
@@ -358,10 +450,27 @@ $app->group('/meeting-outlines/api', function (RouteCollectorProxy $group) use (
 
             return SlimUtils::renderJSON($response, [
                 'success' => true,
-                'message' => gettext('Item deleted.'),
+                'message' => dgettext('meeting-outlines', 'Item deleted.'),
             ]);
         } catch (\Throwable $e) {
-            return SlimUtils::renderErrorJSON($response, gettext('Failed to delete item.'), [], 500, $e, $request);
+            return SlimUtils::renderErrorJSON($response, dgettext('meeting-outlines', 'Failed to delete item.'), [], 500, $e, $request);
+        }
+    });
+
+    // POST /plugins/meeting-outlines/api/bible-texts/{version}/{book_nr} — télécharge un livre biblique
+    $group->post('/bible-texts/{version}/{book_nr:[0-9]+}', function (Request $request, Response $response, array $args) use ($plugin): Response {
+        $versionCode = strtoupper((string) $args['version']);
+        $bookNr      = (int) $args['book_nr'];
+
+        if ($bookNr < 1 || $bookNr > 66) {
+            return SlimUtils::renderJSON($response, ['success' => false, 'message' => 'Numéro de livre invalide.'], 400);
+        }
+
+        try {
+            $result = $plugin->downloadBibleBook($versionCode, $bookNr);
+            return SlimUtils::renderJSON($response, $result, $result['success'] ? 200 : 500);
+        } catch (\Throwable $e) {
+            return SlimUtils::renderErrorJSON($response, 'Échec du téléchargement.', [], 500, $e, $request);
         }
     });
 
@@ -372,24 +481,6 @@ $app->group('/meeting-outlines/api', function (RouteCollectorProxy $group) use (
         return SlimUtils::renderJSON($response, ['members' => $members]);
     });
 
-    // GET /plugins/meeting-outlines/api/bible/{version}/{book}/{chapter}
-    $group->get('/bible/{version:[A-Z]+}/{book:[0-9]+}/{chapter:[0-9]+}', function (Request $request, Response $response, array $args) use ($plugin): Response {
-        $localVersions = array_column(
-            array_filter($plugin->getBibleVersions(), fn($v) => $v['local']),
-            'code'
-        );
-        if (!in_array($args['version'], $localVersions, true)) {
-            return SlimUtils::renderJSON($response, ['success' => false, 'message' => gettext('Version not available.')], 404);
-        }
-
-        $verses = $plugin->getBibleChapter($args['version'], (int) $args['book'], (int) $args['chapter']);
-        if (empty($verses)) {
-            return SlimUtils::renderJSON($response, ['success' => false, 'message' => gettext('Chapter not found.')], 404);
-        }
-
-        return SlimUtils::renderJSON($response, ['verses' => $verses]);
-    });
-
     // POST /plugins/meeting-outlines/api/services/{id}/items/reorder
     $group->post('/services/{id:[0-9]+}/items/reorder', function (Request $request, Response $response, array $args) use ($plugin): Response {
         $serviceId = (int) $args['id'];
@@ -397,7 +488,7 @@ $app->group('/meeting-outlines/api', function (RouteCollectorProxy $group) use (
         $ids       = $data['ids'] ?? [];
 
         if (!is_array($ids)) {
-            return SlimUtils::renderJSON($response, ['success' => false, 'message' => gettext('Invalid data.')], 400);
+            return SlimUtils::renderJSON($response, ['success' => false, 'message' => dgettext('meeting-outlines', 'Invalid data.')], 400);
         }
 
         $ok = $plugin->reorderItems($serviceId, $ids);

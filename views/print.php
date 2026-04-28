@@ -8,12 +8,12 @@ use ChurchCRM\dto\SystemURLs;
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= gettext('Meeting Outline') ?> — <?= htmlspecialchars($service['title']) ?></title>
+    <title><?= dgettext('meeting-outlines', 'Meeting Outline') ?> — <?= htmlspecialchars($service['title']) ?></title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
-            font-family: Georgia, 'Times New Roman', serif;
+            font-family: 'Segoe UI', Arial, Helvetica, sans-serif;
             font-size: 12pt;
             color: #111;
             background: #fff;
@@ -100,17 +100,31 @@ use ChurchCRM\dto\SystemURLs;
             color: #666;
             white-space: nowrap;
         }
-        .verse-text {
-            margin-top: 5px;
-            font-size: 10pt;
-            color: #333;
+        .item-ref {
+            display: inline-block;
+            font-size: 9pt;
             font-style: italic;
-            line-height: 1.5;
+            color: #3a6ea8;
+            margin-left: 6px;
         }
-        .verse-text sup {
-            font-size: 7pt;
+        .bible-text-row td {
+            border: 1px solid #ddd;
+            border-top: none;
+            padding: 6px 14px 12px 14px;
+            background: #faf8f4;
+        }
+        .bible-text-cell {
+            font-size: 10pt;
+            font-weight: normal;
+            line-height: 1.75;
+            text-align: justify;
+            color: #222;
+        }
+        .vnum {
+            font-size: 6.5pt;
+            vertical-align: super;
             color: #888;
-            margin-right: 2px;
+            margin-right: 1px;
         }
 
         /* Message vide */
@@ -188,11 +202,11 @@ use ChurchCRM\dto\SystemURLs;
 
     <!-- Boutons écran -->
     <div class="screen-only">
-        <a href="javascript:history.back()" class="btn-back">
-            &#8592; <?= gettext('Back') ?>
-        </a>
+        <button class="btn-back" onclick="window.close()">
+            &#8592; <?= dgettext('meeting-outlines', 'Back') ?>
+        </button>
         <button class="btn-print" onclick="window.print()">
-            &#128438; <?= gettext('Print') ?>
+            &#128438; <?= dgettext('meeting-outlines', 'Print') ?>
         </button>
     </div>
 
@@ -200,10 +214,21 @@ use ChurchCRM\dto\SystemURLs;
     <div class="print-header">
         <h1><?= htmlspecialchars($service['title']) ?></h1>
         <div class="meta">
-            <span><?= htmlspecialchars(date('l, F j, Y', strtotime($service['date']))) ?></span>
-            <?php if (!empty($service['preacher'])): ?>
+            <?php
+                $ts     = strtotime($service['date']);
+                $locale = SystemConfig::getValue('sLanguage') ?: 'en_US';
+                if (class_exists('IntlDateFormatter')) {
+                    $fmt       = new \IntlDateFormatter($locale, \IntlDateFormatter::FULL, \IntlDateFormatter::NONE);
+                    $dateLabel = $fmt->format($ts);
+                } else {
+                    $dateLabel = date('d/m/Y', $ts);
+                }
+            ?>
+            <span><?= htmlspecialchars($dateLabel) ?></span>
+            <?php $preacherDisplay = $service['preacher_display'] ?? $service['preacher'] ?? ''; ?>
+            <?php if (!empty($preacherDisplay)): ?>
                 <span>·</span>
-                <span><?= htmlspecialchars($service['preacher']) ?></span>
+                <span><?= htmlspecialchars($preacherDisplay) ?></span>
             <?php endif; ?>
             <span>·</span>
             <span><?= htmlspecialchars($serviceTypes[$service['type']] ?? $service['type']) ?></span>
@@ -212,20 +237,31 @@ use ChurchCRM\dto\SystemURLs;
 
     <!-- Programme -->
     <?php if (empty($items)): ?>
-        <p class="empty-msg"><?= gettext('No items added yet.') ?></p>
+        <p class="empty-msg"><?= dgettext('meeting-outlines', 'No items added yet.') ?></p>
     <?php else: ?>
     <table class="order-table">
         <thead>
             <tr>
                 <th class="item-num">#</th>
-                <th><?= gettext('Item Type') ?></th>
-                <th><?= gettext('Title') ?></th>
-                <th><?= gettext('Responsible') ?></th>
-                <th><?= gettext('Duration (minutes)') ?></th>
+                <th><?= dgettext('meeting-outlines', 'Item Type') ?></th>
+                <th><?= dgettext('meeting-outlines', 'Title') ?></th>
+                <th><?= dgettext('meeting-outlines', 'Responsible') ?></th>
+                <th><?= dgettext('meeting-outlines', 'Duration (minutes)') ?></th>
             </tr>
         </thead>
         <tbody>
         <?php foreach ($items as $i => $item): ?>
+            <?php
+                $bibleRef = '';
+                if ($item['item_type'] === 'bible_reading' && !empty($item['bible_book'])) {
+                    $bibleRef = $plugin->formatBibleRef(
+                        (int) $item['bible_book'],
+                        (int) $item['bible_chapter'],
+                        (int) $item['bible_verse_start'],
+                        $item['bible_verse_end'] ? (int) $item['bible_verse_end'] : null
+                    );
+                }
+            ?>
             <tr>
                 <td class="item-num"><?= $i + 1 ?></td>
                 <td class="item-type-col">
@@ -233,24 +269,29 @@ use ChurchCRM\dto\SystemURLs;
                 </td>
                 <td class="item-title-col">
                     <?= htmlspecialchars($item['title']) ?>
+                    <?php if (!empty($bibleRef)): ?>
+                        <span class="item-ref"><?= htmlspecialchars($bibleRef) ?></span>
+                    <?php endif; ?>
                     <?php if (!empty($item['description'])): ?>
                         <div class="item-desc"><?= htmlspecialchars($item['description']) ?></div>
                     <?php endif; ?>
-                    <?php if (!empty($item['verse_texts'])): ?>
-                        <div class="verse-text">
-                            <?php foreach ($item['verse_texts'] as $v): ?>
-                                <sup><?= (int) $v['num'] ?></sup><?= htmlspecialchars($v['text']) ?>
-                            <?php endforeach; ?>
-                        </div>
-                    <?php endif; ?>
                 </td>
                 <td class="item-responsible">
-                    <?= htmlspecialchars($item['responsible']) ?>
+                    <?= htmlspecialchars($item['responsible_display'] ?? $item['responsible'] ?? '') ?>
                 </td>
                 <td class="item-duration-col">
-                    <?= $item['duration_minutes'] ? (int)$item['duration_minutes'] . ' ' . gettext('min') : '' ?>
+                    <?= $item['duration_minutes'] ? (int)$item['duration_minutes'] . ' ' . dgettext('meeting-outlines', 'min') : '' ?>
                 </td>
             </tr>
+            <?php if (isset($bibleVerses[$item['id']])): ?>
+            <tr class="bible-text-row">
+                <td colspan="5" class="bible-text-cell">
+                    <?php foreach ($bibleVerses[$item['id']] as $vNum => $vText): ?>
+                        <sup class="vnum"><?= $vNum ?></sup><?= htmlspecialchars(trim($vText)) ?><?= ' ' ?>
+                    <?php endforeach; ?>
+                </td>
+            </tr>
+            <?php endif; ?>
         <?php endforeach; ?>
         </tbody>
     </table>
@@ -259,7 +300,7 @@ use ChurchCRM\dto\SystemURLs;
     <!-- Notes -->
     <?php if (!empty($service['notes'])): ?>
     <div class="notes-block">
-        <h2><?= gettext('Notes') ?></h2>
+        <h2><?= dgettext('meeting-outlines', 'Notes') ?></h2>
         <p><?= nl2br(htmlspecialchars($service['notes'])) ?></p>
     </div>
     <?php endif; ?>
@@ -268,7 +309,7 @@ use ChurchCRM\dto\SystemURLs;
     <div class="print-footer">
         <?= htmlspecialchars(SystemConfig::getValue('sChurchName') ?: '') ?>
         &nbsp;·&nbsp;
-        <?= gettext('Meeting Outline') ?>
+        <?= dgettext('meeting-outlines', 'Meeting Outline') ?>
         &nbsp;·&nbsp;
         <?= htmlspecialchars(date('d/m/Y', strtotime($service['date']))) ?>
     </div>
