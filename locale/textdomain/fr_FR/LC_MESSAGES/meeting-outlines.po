@@ -1,5 +1,5 @@
 # Plugin meeting-outlines — French translations
-# Copyright (C) 2026 Eoles Conseil
+# Copyright (C) 2026 huckjs-sys
 # MIME-Version: 1.0
 # Content-Type: text/plain; charset=UTF-8
 # Content-Transfer-Encoding: 8bit

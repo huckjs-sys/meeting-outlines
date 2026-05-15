@@ -3,7 +3,7 @@
     "name": "Meeting Outlines",
     "description": "Manage the outlines of church meetings. Create, edit and print meeting programs.",
     "version": "1.0.1",
-    "author": "Eoles Conseil",
+    "author": "huckjs-sys",
     "authorUrl": "https://eoles-conseil.fr",
     "type": "community",
     "minimumCRMVersion": "7.0.0",
