@@ -410,7 +410,7 @@ $itemTypeColors = [
 .item-badge-other         { background-color: #6b7280; color: #fff; } /* gris    — autre    */
 </style>
 
-<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.3/Sortable.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.3/Sortable.min.js" integrity="sha384-/jkFGhPVLS9HIUzX09xB5W3coE5q1X5NXZA/PuOAdOaRxUPczlZmKzYEq9QcJnW0" crossorigin="anonymous"></script>
 <script>
 const ROOT_PATH    = <?= json_encode(SystemURLs::getRootPath()) ?>;
 const SERVICE_ID   = <?= json_encode($serviceId) ?>;

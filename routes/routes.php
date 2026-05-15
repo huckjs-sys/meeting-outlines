@@ -184,6 +184,16 @@ $app->group('/meeting-outlines/api', function (RouteCollectorProxy $group) use (
         if (empty(trim($data['title'] ?? ''))) {
             $errors[] = dgettext('meeting-outlines', 'Title is required.');
         }
+        $validStatuses = array_keys(MeetingOutlinesPlugin::getStatusLabels());
+        $status        = $data['status'] ?? 'draft';
+        if (!in_array($status, $validStatuses, true)) {
+            $errors[] = dgettext('meeting-outlines', 'Invalid status.');
+        }
+        $validTypes  = array_keys($plugin->getServiceTypes());
+        $serviceType = $data['type'] ?? 'sunday';
+        if (!in_array($serviceType, $validTypes, true)) {
+            $errors[] = dgettext('meeting-outlines', 'Invalid meeting type.');
+        }
 
         if (!empty($errors)) {
             return SlimUtils::renderJSON($response, ['success' => false, 'errors' => $errors], 400);
@@ -193,12 +203,12 @@ $app->group('/meeting-outlines/api', function (RouteCollectorProxy $group) use (
             $id = $plugin->createService([
                 'date'               => trim($data['date']),
                 'title'              => trim($data['title']),
-                'type'               => $data['type']               ?? 'sunday',
+                'type'               => $serviceType,
                 'preacher'           => trim($data['preacher']       ?? ''),
                 'preacher_person_id'  => $data['preacher_person_id']  ?? null,
                 'president_person_id' => $data['president_person_id'] ?? null,
                 'notes'               => trim($data['notes']          ?? ''),
-                'status'              => $data['status']              ?? 'draft',
+                'status'              => $status,
             ]);
 
             return SlimUtils::renderJSON($response, [
@@ -222,6 +232,16 @@ $app->group('/meeting-outlines/api', function (RouteCollectorProxy $group) use (
         if (empty(trim($data['title'] ?? ''))) {
             $errors[] = dgettext('meeting-outlines', 'Title is required.');
         }
+        $validStatuses = array_keys(MeetingOutlinesPlugin::getStatusLabels());
+        $status        = $data['status'] ?? 'draft';
+        if (!in_array($status, $validStatuses, true)) {
+            $errors[] = dgettext('meeting-outlines', 'Invalid status.');
+        }
+        $validTypes  = array_keys($plugin->getServiceTypes());
+        $serviceType = $data['type'] ?? 'sunday';
+        if (!in_array($serviceType, $validTypes, true)) {
+            $errors[] = dgettext('meeting-outlines', 'Invalid meeting type.');
+        }
 
         if (!empty($errors)) {
             return SlimUtils::renderJSON($response, ['success' => false, 'errors' => $errors], 400);
@@ -236,12 +256,12 @@ $app->group('/meeting-outlines/api', function (RouteCollectorProxy $group) use (
             $plugin->updateService((int) $args['id'], [
                 'date'               => trim($data['date']),
                 'title'              => trim($data['title']),
-                'type'               => $data['type']               ?? 'sunday',
+                'type'               => $serviceType,
                 'preacher'           => trim($data['preacher']       ?? ''),
                 'preacher_person_id'  => $data['preacher_person_id']  ?? null,
                 'president_person_id' => $data['president_person_id'] ?? null,
                 'notes'               => trim($data['notes']          ?? ''),
-                'status'              => $data['status']              ?? 'draft',
+                'status'              => $status,
             ]);
 
             return SlimUtils::renderJSON($response, [
@@ -366,6 +386,11 @@ $app->group('/meeting-outlines/api', function (RouteCollectorProxy $group) use (
         if (empty(trim($data['title'] ?? ''))) {
             $errors[] = dgettext('meeting-outlines', 'Item title is required.');
         }
+        $validItemTypes = array_keys(MeetingOutlinesPlugin::getItemTypes());
+        $itemType       = $data['item_type'] ?? 'other';
+        if (!in_array($itemType, $validItemTypes, true)) {
+            $errors[] = dgettext('meeting-outlines', 'Invalid item type.');
+        }
 
         if (!empty($errors)) {
             return SlimUtils::renderJSON($response, ['success' => false, 'errors' => $errors], 400);
@@ -373,7 +398,7 @@ $app->group('/meeting-outlines/api', function (RouteCollectorProxy $group) use (
 
         try {
             $id   = $plugin->createItem($serviceId, [
-                'item_type'             => $data['item_type']              ?? 'other',
+                'item_type'             => $itemType,
                 'title'                 => trim($data['title']),
                 'description'           => trim($data['description']           ?? ''),
                 'duration_minutes'      => $data['duration_minutes']           ?? null,
@@ -409,6 +434,11 @@ $app->group('/meeting-outlines/api', function (RouteCollectorProxy $group) use (
         if (empty(trim($data['title'] ?? ''))) {
             $errors[] = dgettext('meeting-outlines', 'Item title is required.');
         }
+        $validItemTypes = array_keys(MeetingOutlinesPlugin::getItemTypes());
+        $itemType       = $data['item_type'] ?? 'other';
+        if (!in_array($itemType, $validItemTypes, true)) {
+            $errors[] = dgettext('meeting-outlines', 'Invalid item type.');
+        }
 
         if (!empty($errors)) {
             return SlimUtils::renderJSON($response, ['success' => false, 'errors' => $errors], 400);
@@ -416,7 +446,7 @@ $app->group('/meeting-outlines/api', function (RouteCollectorProxy $group) use (
 
         try {
             $plugin->updateItem((int) $args['id'], [
-                'item_type'             => $data['item_type']              ?? 'other',
+                'item_type'             => $itemType,
                 'title'                 => trim($data['title']),
                 'description'           => trim($data['description']           ?? ''),
                 'duration_minutes'      => $data['duration_minutes']           ?? null,

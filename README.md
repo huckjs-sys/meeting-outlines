@@ -310,8 +310,15 @@ The menu is only added when the plugin is enabled.
 The edit view loads **SortableJS 1.15.3** from jsDelivr CDN at render time:
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.3/Sortable.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.3/Sortable.min.js"
+        integrity="sha384-/jkFGhPVLS9HIUzX09xB5W3coE5q1X5NXZA/PuOAdOaRxUPczlZmKzYEq9QcJnW0"
+        crossorigin="anonymous"></script>
 ```
+
+The `integrity` attribute (SRI — Subresource Integrity) ensures the browser rejects
+the script if the CDN serves a tampered or unexpected file. The CDN is kept rather
+than bundling because jsDelivr is already an allowed `network.outbound` host listed
+in `approved-plugins.json`, and SRI provides equivalent tamper-protection.
 
 Sorting is constrained to the `.drag-handle` icon (grip) so that buttons and
 other interactive elements inside each row do not interfere. The new order is

@@ -226,7 +226,12 @@ class MeetingOutlinesPlugin extends AbstractPlugin
     {
         $this->setConfigValue('preachers_group_id',    (string) ((int) ($data['preachers_group_id']    ?? 0)));
         $this->setConfigValue('responsibles_group_id', (string) ((int) ($data['responsibles_group_id'] ?? 0)));
-        $this->setConfigValue('bible_version',         $data['bible_version'] ?? 'LSG');
+
+        $requestedVersion = $data['bible_version'] ?? 'LSG';
+        $knownCodes       = array_column($this->getBibleVersions(), 'code');
+        if (in_array($requestedVersion, $knownCodes, true)) {
+            $this->setConfigValue('bible_version', $requestedVersion);
+        }
     }
 
     // ------------------------------------------------------------------
